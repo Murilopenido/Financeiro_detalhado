@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Financeiro</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #1e293b;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: #1e293b;
+            color: white;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+        }
+
+        .sidebar-menu {
+            padding: 10px;
+        }
+
+        .sidebar-menu a {
+            display: block;
+            text-decoration: none;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .sidebar-menu a:hover {
+            background: #334155;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 25px;
+        }
+
+        .dashboard-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, .08);
+        }
+
+        .chart-card {
+            min-height: 420px;
+        }
+
+        .menu-toggle {
+            display: none;
+        }
+
+        .autocomplete-sugestoes {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            max-height: 180px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .autocomplete-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            font-size: 13px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .autocomplete-item:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        @media(max-width:992px) {
+            .sidebar {
+                transform: translateX(-260px);
+                transition: .3s;
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+                position: fixed;
+                top: 15px;
+                left: 15px;
+                z-index: 1200;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <button class="btn btn-primary menu-toggle" onclick="toggleSidebar()">
+        <i class="bi bi-list"></i>
+    </button>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h4>💰 Finanças</h4>
+        </div>
+        <div class="sidebar-menu">
+            <a href="#" onclick="mostrarTela('dashboardTela')"><i class="bi bi-speedometer2"></i> Dashboard</a>
+            <a href="#" onclick="mostrarTela('comprasCredito')"><i class="bi bi-cart"></i> Compras Crédito</a>
+            <a href="#" onclick="mostrarTela('parcelasTela')"><i class="bi bi-box-seam"></i> Parcelas & Faturas</a>
+            <a href="#" onclick="mostrarTela('debitoTela')"><i class="bi bi-wallet2"></i> Débito / Pix</a>
+            <a href="#" onclick="mostrarTela('outrosGastosTela')"><i class="bi bi-cash-stack"></i> Outros Gastos</a>
+            <a href="#" onclick="mostrarTela('orcamentosTela')"><i class="bi bi-pie-chart"></i> Orçamentos</a>
+            <a href="#" onclick="mostrarTela('investimentosTela')"><i class="bi bi-graph-up-arrow"></i> Investimentos & Ações</a>
+            <a href="#" onclick="mostrarTela('receitasTela')"><i class="bi bi-wallet2"></i> Receitas</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+
+        <!-- TELA 1: DASHBOARD -->
+        <div id="dashboardTela">
+            <h2 class="mb-4">Dashboard Financeiro</h2>
+            <div class="row g-3">
+                <div class="col-md-3"><div class="card dashboard-card"><div class="card-body"><small class="text-muted">Saldo Atual</small><h3 id="saldoAtual">R$ 0,00</h3></div></div></div>
+                <div class="col-md-3"><div class="card dashboard-card"><div class="card-body"><small class="text-muted">Receitas</small><h3 id="totalReceitas">R$ 0,00</h3></div></div></div>
+                <div class="col-md-3"><div class="card dashboard-card"><div class="card-body"><small class="text-muted">Despesas</small><h3 id="totalDespesas">R$ 0,00</h3></div></div></div>
+                <div class="col-md-3"><div class="card dashboard-card"><div class="card-body"><small class="text-muted">Parcelas</small><h3 id="parcelasAbertas">0</h3></div></div></div>
+            </div>
+
+            <div class="row mt-3 g-3">
+                <div class="col-md-3"><div class="card dashboard-card"><div class="card-body"><small class="text-muted">Total Crédito</small><h4 id="totalCredito">R$ 0,00</h4></div></div></div>
+                <div class="col-md-3"><div class="card dashboard-card"><div class="card-body"><small class="text-muted">Total Débito</small><h4 id="totalDebito">R$ 0,00</h4></div></div></div>
+                <div class="col-md-3"><div class="card dashboard-card"><div class="card-body"><small class="text-muted">Outros Gastos</small><h4 id="outrosGastos">R$ 0,00</h4></div></div></div>
+                <div class="col-md-3"><div class="card dashboard-card bg-primary text-white"><div class="card-body"><small>Próxima Fatura</small><h4 id="proximaFatura">R$ 0,00</h4><div id="competenciaFatura"></div></div></div></div>
+            </div>
+
+            <div class="row mt-4 g-3">
+                <div class="col-lg-6"><div class="card dashboard-card chart-card"><div class="card-header bg-white fw-bold">Gastos por Categoria</div><div class="card-body"><canvas id="graficoCategorias"></canvas></div></div></div>
+                <div class="col-lg-6"><div class="card dashboard-card chart-card"><div class="card-header bg-white fw-bold">Evolução Mensal</div><div class="card-body"><canvas id="graficoMensal"></canvas></div></div></div>
+            </div>
+        </div>
+
+        <!-- TELA 2: COMPRAS CRÉDITO -->
+        <div id="comprasCredito" style="display:none;">
+            <!-- CARD DE CADASTRO -->
+            <div class="card dashboard-card mb-4">
+                <div class="card-header bg-white fw-bold">Cadastro de Compras no Crédito</div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3"><label class="form-label">Cartão</label><select id="cartao" class="form-select"></select></div>
+                        <div class="col-md-3"><label class="form-label">Categoria</label><select id="categoria" class="form-select"></select></div>
+                        <div class="col-md-6"><label class="form-label">Descrição</label><input type="text" id="descricao" class="form-control"></div>
+                        <div class="col-md-3"><label class="form-label">Data Compra</label><input type="date" id="dataCompra" class="form-control"></div>
+                        <div class="col-md-3"><label class="form-label">Valor Compra</label><input type="number" step="0.01" id="valorCompra" class="form-control"></div>
+                        <div class="col-md-3"><label class="form-label">Parcelado</label><select id="parcelado" class="form-select"><option value="false">Não</option><option value="true">Sim</option></select></div>
+                        <div class="col-md-3"><label class="form-label">Parcelas</label><input type="number" id="quantidadeParcelas" value="1" min="1" class="form-control"></div>
+                    </div>
+                    <button class="btn btn-primary mt-3" onclick="salvarCompra()">Salvar Compra</button>
+                </div>
+            </div>
+
+            <!-- CARD DE FILTROS E LISTAGEM -->
+            <div class="card dashboard-card">
+                <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
+                    <span>Compras Cadastradas</span>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="limparFiltrosCompras()">Limpar Filtros</button>
+                </div>
+                <div class="card-body">
+                    <!-- BARRA DE FILTROS -->
+                    <div class="row g-3 mb-3 bg-light p-3 rounded">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold"><i class="bi bi-credit-card"></i> Filtrar por Cartão</label>
+                            <select id="filtroCartao" class="form-select" onchange="aplicarFiltrosCompras()">
+                                <option value="">Todos os Cartões</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold"><i class="bi bi-tags"></i> Filtrar por Categoria</label>
+                            <select id="filtroCategoria" class="form-select" onchange="aplicarFiltrosCompras()">
+                                <option value="">Todas as Categorias</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold"><i class="bi bi-calendar-month"></i> Mês da Compra</label>
+                            <input type="month" id="filtroMesAno" class="form-control" onchange="aplicarFiltrosCompras()">
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <span id="contadorComprasFiltro" class="text-muted small"></span>
+                        </div>
+                    </div>
+
+                    <!-- TABELA -->
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Data Compra</th>
+                                    <th>Data Cadastro</th>
+                                    <th>Descrição</th>
+                                    <th>Cartão</th>
+                                    <th>Categoria</th>
+                                    <th>Valor</th>
+                                    <th>Parcelas</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbCompras"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA 3: PARCELAS E FATURAS -->
+        <div id="parcelasTela" style="display:none;">
+            <div class="card dashboard-card mb-4">
+                <div class="card-header bg-white fw-bold">Parcelas em Aberto</div>
+                <div class="card-body table-responsive">
+                    <table class="table align-middle">
+                        <thead><tr><th>Compra</th><th>Parcela</th><th>Vencimento</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead>
+                        <tbody id="tbParcelasTela"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card dashboard-card">
+                <div class="card-header bg-white fw-bold">Próximas Faturas</div>
+                <div class="card-body table-responsive">
+                    <table class="table align-middle">
+                        <thead><tr><th>Mês</th><th>Parcelas</th><th>Total</th></tr></thead>
+                        <tbody id="tbFaturas"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA 4: DÉBITO / PIX -->
+        <div id="debitoTela" style="display:none;">
+            <div class="card dashboard-card mb-4">
+                <div class="card-header bg-white fw-bold">💳 Lançamentos no Débito ou Pix</div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Descrição</label>
+                            <input type="text" id="descDebito" class="form-control" placeholder="Ex: Supermercado, Farmácia...">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Valor (R$)</label>
+                            <input type="number" step="0.01" id="valorDebito" class="form-control" placeholder="0,00">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Data</label>
+                            <input type="date" id="dataDebito" class="form-control">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button class="btn btn-primary w-100" onclick="salvarDebito()">Adicionar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card dashboard-card">
+                <div class="card-header bg-white fw-bold">Histórico de Débitos / Pix</div>
+                <div class="card-body table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Descrição</th>
+                                <th>Valor</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbDebito"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA 5: OUTROS GASTOS -->
+        <div id="outrosGastosTela" style="display:none;">
+            <div class="card dashboard-card mb-4">
+                <div class="card-header bg-white fw-bold">💸 Outros Gastos e Despesas Avulsas</div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <label class="form-label">Descrição</label>
+                            <input type="text" id="descOutros" class="form-control" placeholder="Ex: Manutenção, Imprevistos...">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Valor (R$)</label>
+                            <input type="number" step="0.01" id="valorOutros" class="form-control" placeholder="0,00">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Data</label>
+                            <input type="date" id="dataOutros" class="form-control">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button class="btn btn-primary w-100" onclick="salvarOutrosGastos()">Adicionar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card dashboard-card">
+                <div class="card-header bg-white fw-bold">Histórico de Outros Gastos</div>
+                <div class="card-body table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Descrição</th>
+                                <th>Valor</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbOutrosGastos"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA 6: ORÇAMENTOS -->
+        <div id="orcamentosTela" style="display:none;">
+            <div class="card dashboard-card">
+                <div class="card-header bg-white fw-bold">🎯 Orçamento x Realizado por Categoria</div>
+                <div class="card-body table-responsive">
+                    <table class="table align-middle">
+                        <thead><tr><th>Categoria</th><th>Planejado</th><th>Realizado</th><th>% Utilizado</th></tr></thead>
+                        <tbody id="tbOrcamentosTela"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA 7: INVESTIMENTOS & AÇÕES -->
+        <div id="investimentosTela" style="display:none;">
+            <div class="card dashboard-card mb-4">
+                <div class="card-header bg-white fw-bold">📈 Gestão de Investimentos & Ações</div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3 position-relative">
+                            <label class="form-label">Ativo / Ticker ou Empresa</label>
+                            <input type="text" id="tickerInvestimento" class="form-control" placeholder="Ex: PETR4 ou Banco do Brasil..." autocomplete="off">
+                            <div id="sugestoesAcoes" class="autocomplete-sugestoes"></div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Tipo</label>
+                            <select id="tipoInvestimento" class="form-select">
+                                <option value="Ação">Ação</option>
+                                <option value="FII">Fundo Imobiliário (FII)</option>
+                                <option value="Renda Fixa">Renda Fixa</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Quantidade</label>
+                            <input type="number" step="0.01" id="qtdInvestimento" class="form-control" value="1">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Valor Aplicado (Total)</label>
+                            <input type="number" step="0.01" id="valorInvestimento" class="form-control" placeholder="0,00">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Valor Atual (Unit.)</label>
+                            <input type="number" step="0.01" id="valorAtualUnitario" class="form-control" placeholder="Opcional">
+                        </div>
+                        <div class="col-md-1 d-flex align-items-end">
+                            <button class="btn btn-primary w-100" onclick="salvarInvestimento()">Adicionar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card dashboard-card">
+                <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
+                    <span>Minha Carteira</span>
+                    <button class="btn btn-sm btn-outline-success" onclick="atualizarCotacoesBrapi()">Atualizar Cotações (Brapi)</button>
+                </div>
+                <div class="card-body table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Ativo</th>
+                                <th>Tipo</th>
+                                <th>Qtd</th>
+                                <th>Valor Aplicado</th>
+                                <th>Preço Atual (Un.)</th>
+                                <th>Saldo Atual</th>
+                                <th>Lucro / Prejuízo</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbInvestimentos"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA 8: RECEITAS -->
+        <div id="receitasTela" style="display:none;">
+            <div class="card dashboard-card mb-4">
+                <div class="card-header bg-white fw-bold">💰 Gestão de Receitas (Entradas)</div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <label class="form-label">Descrição da Receita</label>
+                            <input type="text" id="descReceita" class="form-control" placeholder="Ex: Salário, Freelance...">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Valor (R$)</label>
+                            <input type="number" step="0.01" id="valorReceita" class="form-control" placeholder="0,00">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Data</label>
+                            <input type="date" id="dataReceita" class="form-control">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button class="btn btn-success w-100" onclick="salvarReceita()">Adicionar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card dashboard-card">
+                <div class="card-header bg-white fw-bold">Histórico de Receitas</div>
+                <div class="card-body table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Descrição</th>
+                                <th>Valor</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbReceitas"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://ykskyuxsexfhwbdejxqy.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_bWsaR67hlPqsx9v0e9MLYQ__g8SY8_r";
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let listaTodasCompras = [];
+
+        function moeda(valor) {
+            return Number(valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function formatarData(dataIso) {
+            if (!dataIso) return '';
+            const partes = dataIso.split('-');
+            if (partes.length !== 3) return dataIso;
+            return `${partes[2]}/${partes[1]}/${partes[0]}`;
+        }
+
+        function formatarDataHora(dataIso) {
+            if (!dataIso) return '-';
+            const dataObj = new Date(dataIso);
+            return dataObj.toLocaleDateString('pt-BR') + ' ' + dataObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function toggleSidebar() {
+            document.getElementById("sidebar").classList.toggle("show");
+        }
+
+        function mostrarTela(nomeTela) {
+            document.querySelectorAll('.main-content > div[id$="Tela"], .main-content > div[id="comprasCredito"]').forEach(el => el.style.display = 'none');
+
+            const tela = document.getElementById(nomeTela);
+            if (tela) tela.style.display = 'block';
+
+            if (nomeTela === 'dashboardTela') { carregarDashboard(); carregarFatura(); }
+            if (nomeTela === 'comprasCredito') { carregarCartoes(); carregarCategorias(); carregarCompras(); }
+            if (nomeTela === 'parcelasTela') { carregarParcelasTela(); carregarFaturas(); }
+            if (nomeTela === 'debitoTela') { carregarDebitos(); }
+            if (nomeTela === 'outrosGastosTela') { carregarOutrosGastos(); }
+            if (nomeTela === 'orcamentosTela') { carregarOrcamentosTela(); }
+            if (nomeTela === 'investimentosTela') { carregarInvestimentos(); }
+            if (nomeTela === 'receitasTela') {
+                carregarReceitas();
+                const inputData = document.getElementById('dataReceita');
+                if (inputData && !inputData.value) inputData.value = new Date().toISOString().split('T')[0];
+            }
+        }
+
+        const acoesPopulares = [
+            { ticker: "BBAS3", nome: "Banco do Brasil" },
+            { ticker: "BBDC4", nome: "Bradesco PN" },
+            { ticker: "ITUB4", nome: "Itaú Unibanco" },
+            { ticker: "SANB11", nome: "Banco Santander" },
+            { ticker: "PETR4", nome: "Petrobras PN" },
+            { ticker: "VALE3", nome: "Vale S.A." },
+            { ticker: "WEGE3", nome: "Weg S.A." },
+            { ticker: "ABEV3", nome: "Ambev S.A." },
+            { ticker: "MGLU3", nome: "Magazine Luiza" },
+            { ticker: "BBSE3", nome: "BB Seguridade" },
+            { ticker: "MXRF11", nome: "FII Maxi Renda" },
+            { ticker: "HGLG11", nome: "FII CSHG Logística" },
+            { ticker: "KNCR11", nome: "FII Kinea Rendimentos" },
+            { ticker: "XPML11", nome: "FII XP Malls" }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputNome = document.getElementById('tickerInvestimento');
+            const divSugestoes = document.getElementById('sugestoesAcoes');
+
+            if (inputNome && divSugestoes) {
+                inputNome.addEventListener('input', (e) => {
+                    const termo = e.target.value.toLowerCase().trim();
+                    if (termo.length < 1) { divSugestoes.style.display = 'none'; return; }
+                    const filtrados = acoesPopulares.filter(a => a.ticker.toLowerCase().includes(termo) || a.nome.toLowerCase().includes(termo));
+                    if (filtrados.length) {
+                        divSugestoes.innerHTML = filtrados.map(a => `
+                            <div class="autocomplete-item" onclick="selecionarAtivo('${a.ticker}')">
+                                <strong>${a.ticker}</strong> - <small class="text-muted">${a.nome}</small>
+                            </div>
+                        `).join('');
+                        divSugestoes.style.display = 'block';
+                    } else {
+                        divSugestoes.style.display = 'none';
+                    }
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!inputNome.contains(e.target) && !divSugestoes.contains(e.target)) {
+                        divSugestoes.style.display = 'none';
+                    }
+                });
+            }
+
+            if (document.getElementById('dataCompra')) document.getElementById('dataCompra').value = new Date().toISOString().split('T')[0];
+            if (document.getElementById('dataDebito')) document.getElementById('dataDebito').value = new Date().toISOString().split('T')[0];
+            if (document.getElementById('dataOutros')) document.getElementById('dataOutros').value = new Date().toISOString().split('T')[0];
+
+            carregarDashboard();
+            carregarFatura();
+            carregarGraficoCategorias();
+            carregarGraficoMensal();
+        });
+
+        function selecionarAtivo(ticker) {
+            const inputNome = document.getElementById('tickerInvestimento');
+            const divSugestoes = document.getElementById('sugestoesAcoes');
+            if (inputNome) inputNome.value = ticker;
+            if (divSugestoes) divSugestoes.style.display = 'none';
+        }
+
+        // DASHBOARD
+        async function carregarDashboard() {
+            const { data, error } = await supabaseClient.from('vw_fin_dashboard').select('*').single();
+            if (error || !data) return;
+            saldoAtual.textContent = moeda(data.saldo_atual);
+            totalReceitas.textContent = moeda(data.total_receitas);
+            totalDespesas.textContent = moeda(data.total_despesas);
+            totalCredito.textContent = moeda(data.total_credito);
+            totalDebito.textContent = moeda(data.total_debito);
+            outrosGastos.textContent = moeda(data.total_outros_gastos);
+            parcelasAbertas.textContent = data.qtd_parcelas_abertas;
+        }
+
+        async function carregarFatura() {
+            const { data } = await supabaseClient.from('vw_fin_dashboard_proxima_fatura').select('*').single();
+            if (!data) return;
+            proximaFatura.textContent = moeda(data.valor_fatura);
+            competenciaFatura.textContent = `${data.competencia_mes}/${data.competencia_ano}`;
+        }
+
+        async function carregarGraficoCategorias() {
+            const { data } = await supabaseClient.from('vw_fin_dashboard_categorias').select('*');
+            if (!data) return;
+            new Chart(document.getElementById('graficoCategorias'), {
+                type: 'pie',
+                data: { labels: data.map(x => x.categoria), datasets: [{ data: data.map(x => x.valor_total) }] }
+            });
+        }
+
+        async function carregarGraficoMensal() {
+            const { data } = await supabaseClient.from('vw_fin_dashboard_mensal').select('*');
+            if (!data) return;
+            new Chart(document.getElementById('graficoMensal'), {
+                type: 'bar',
+                data: { labels: data.map(x => x.referencia), datasets: [{ label: 'Gastos', data: data.map(x => x.total), backgroundColor: '#2563eb' }] }
+            });
+        }
+
+        // COMPRAS CRÉDITO
+        async function carregarCartoes() {
+            const { data } = await supabaseClient.from('fin_cartoes').select('*').order('nome_cartao');
+            if (!data) return;
+            cartao.innerHTML = data.map(item => `<option value="${item.id}">${item.nome_cartao}</option>`).join('');
+        }
+
+        async function carregarCategorias() {
+            const { data } = await supabaseClient.from('fin_categorias').select('*').order('nome');
+            if (!data) return;
+            categoria.innerHTML = data.map(item => `<option value="${item.id}">${item.nome}</option>`).join('');
+        }
+
+        async function carregarFiltrosSelects() {
+            const { data: cartoes } = await supabaseClient.from('fin_cartoes').select('*').order('nome_cartao');
+            if (cartoes) {
+                filtroCartao.innerHTML = '<option value="">Todos os Cartões</option>' + 
+                    cartoes.map(c => `<option value="${c.id}">${c.nome_cartao}</option>`).join('');
+            }
+
+            const { data: categorias } = await supabaseClient.from('fin_categorias').select('*').order('nome');
+            if (categorias) {
+                filtroCategoria.innerHTML = '<option value="">Todas as Categorias</option>' + 
+                    categorias.map(cat => `<option value="${cat.id}">${cat.nome}</option>`).join('');
+            }
+        }
+
+        async function salvarCompra() {
+            const valor = Number(valorCompra.value);
+            const parcelas = Number(quantidadeParcelas.value);
+            const { error } = await supabaseClient.from('fin_gastos_credito').insert({
+                cartao_id: Number(cartao.value),
+                categoria_id: categoria.value ? Number(categoria.value) : null,
+                descricao: descricao.value,
+                data_compra: dataCompra.value,
+                valor_compra: valor,
+                parcelado: parcelado.value === 'true',
+                quantidade_parcelas: parcelas,
+                valor_parcela: valor / parcelas
+            });
+            if (error) { alert('Erro ao salvar: ' + error.message); return; }
+            alert('Compra cadastrada com sucesso!');
+            carregarCompras();
+            carregarDashboard();
+            descricao.value = ''; valorCompra.value = ''; quantidadeParcelas.value = 1;
+        }
+
+        async function carregarCompras() {
+            await carregarFiltrosSelects();
+
+            const { data, error } = await supabaseClient
+                .from('vw_fin_compras_credito')
+                .select('*')
+                .order('data_compra', { ascending: false });
+
+            if (error || !data) return;
+
+            listaTodasCompras = data;
+            aplicarFiltrosCompras();
+        }
+
+        function aplicarFiltrosCompras() {
+            const cartaoId = filtroCartao.value;
+            const categoriaId = filtroCategoria.value;
+            const mesAnoVal = filtroMesAno.value;
+
+            let resultado = listaTodasCompras;
+
+            if (cartaoId) {
+                resultado = resultado.filter(item => item.cartao_id == cartaoId);
+            }
+
+            if (categoriaId) {
+                resultado = resultado.filter(item => item.categoria_id == categoriaId);
+            }
+
+            if (mesAnoVal) {
+                const [ano, mes] = mesAnoVal.split('-');
+                resultado = resultado.filter(item => {
+                    if (!item.data_compra) return false;
+                    const dataComp = item.data_compra.split('-');
+                    return dataComp[0] === ano && dataComp[1] === mes;
+                });
+            }
+
+            renderizarTabelaCompras(resultado);
+        }
+
+        function renderizarTabelaCompras(dados) {
+            const tb = document.getElementById('tbCompras');
+            const contador = document.getElementById('contadorComprasFiltro');
+
+            if (contador) {
+                contador.textContent = `Exibindo ${dados.length} de ${listaTodasCompras.length} registros`;
+            }
+
+            if (!dados || dados.length === 0) {
+                tb.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Nenhuma compra encontrada com os filtros selecionados.</td></tr>';
+                return;
+            }
+
+            tb.innerHTML = dados.map(item => `
+                <tr>
+                    <td>${formatarData(item.data_compra)}</td>
+                    <td><small class="text-muted">${formatarDataHora(item.data_cadastro)}</small></td>
+                    <td>${item.descricao}</td>
+                    <td><span class="badge bg-secondary">${item.nome_cartao || '-'}</span></td>
+                    <td>${item.categoria || '-'}</td>
+                    <td class="fw-bold">${moeda(item.valor_compra)}</td>
+                    <td>${item.quantidade_parcelas}x</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="excluirCompra(${item.id})">Excluir</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function limparFiltrosCompras() {
+            filtroCartao.value = '';
+            filtroCategoria.value = '';
+            filtroMesAno.value = '';
+            aplicarFiltrosCompras();
+        }
+
+        async function excluirCompra(id) {
+            if (!confirm('Deseja realmente excluir esta compra?')) return;
+            const { error } = await supabaseClient.from('fin_gastos_credito').delete().eq('id', id);
+            if (error) { alert(error.message); return; }
+            carregarCompras();
+            carregarDashboard();
+        }
+
+        // PARCELAS E FATURAS (STATUS TOGGLE COM BOTAO DESFAZER/PAGAR)
+        async function carregarParcelasTela() {
+            const { data } = await supabaseClient.from('vw_fin_parcelas_detalhadas').select('*');
+            if (!data) return;
+            tbParcelasTela.innerHTML = data.map(item => `
+                <tr>
+                    <td>${item.descricao}</td>
+                    <td>${item.numero_parcela}/${item.total_parcelas}</td>
+                    <td>${formatarData(item.data_vencimento)}</td>
+                    <td>${moeda(item.valor_parcela)}</td>
+                    <td>
+                        ${item.paga ? '<span class="badge bg-success">Paga</span>' : '<span class="badge bg-danger">Aberta</span>'}
+                    </td>
+                    <td>
+                        <button class="btn btn-${item.paga ? 'warning' : 'success'} btn-sm" onclick="pagarParcela(${item.id})">
+                            ${item.paga ? 'Desfazer' : 'Pagar'}
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function pagarParcela(id) {
+            const { data: parcelaAtual, error: erroBusca } = await supabaseClient
+                .from('fin_parcelas_credito')
+                .select('paga')
+                .eq('id', id)
+                .single();
+
+            if (erroBusca) return alert('Erro ao verificar status da parcela.');
+
+            const novoStatus = !parcelaAtual.paga;
+
+            const { error } = await supabaseClient.from('fin_parcelas_credito').update({
+                paga: novoStatus,
+                data_pagamento: novoStatus ? new Date().toISOString().split('T')[0] : null
+            }).eq('id', id);
+
+            if (error) { alert(error.message); return; }
+
+            carregarParcelasTela();
+            carregarDashboard();
+        }
+
+        async function carregarFaturas() {
+            const { data } = await supabaseClient.from('vw_fin_faturas_detalhadas').select('*');
+            if (!data) return;
+            tbFaturas.innerHTML = data.map(item => `
+                <tr><td>${item.competencia_mes}/${item.competencia_ano}</td><td>${item.parcelas}</td><td>${moeda(item.valor_total)}</td></tr>
+            `).join('');
+        }
+
+        // DÉBITO / PIX
+        async function salvarDebito() {
+            const desc = document.getElementById('descDebito').value.trim();
+            const val = Number(document.getElementById('valorDebito').value);
+            const data = document.getElementById('dataDebito').value;
+
+            if (!desc || val <= 0 || !data) return alert('Preencha a descrição, valor e data.');
+
+            const { error } = await supabaseClient.from('fin_movimentacoes_debito').insert({
+                descricao: desc,
+                valor: val,
+                data_movimentacao: data,
+                tipo: 'Despesa'
+            });
+
+            if (error) return alert(error.message);
+
+            alert('Lançamento em débito salvo com sucesso!');
+            document.getElementById('descDebito').value = '';
+            document.getElementById('valorDebito').value = '';
+            await carregarDebitos();
+            await carregarDashboard();
+        }
+
+        async function carregarDebitos() {
+            const { data, error } = await supabaseClient
+                .from('fin_movimentacoes_debito')
+                .select('*')
+                .order('data_movimentacao', { ascending: false });
+
+            if (error || !data) return;
+            const tb = document.getElementById('tbDebito');
+            if (!tb) return;
+
+            tb.innerHTML = data.map(item => `
+                <tr>
+                    <td>${formatarData(item.data_movimentacao)}</td>
+                    <td>${item.descricao}</td>
+                    <td>${moeda(item.valor)}</td>
+                    <td><button class="btn btn-danger btn-sm" onclick="excluirDebito(${item.id})">Excluir</button></td>
+                </tr>
+            `).join('');
+        }
+
+        async function excluirDebito(id) {
+            if (!confirm('Deseja excluir este lançamento?')) return;
+            const { error } = await supabaseClient.from('fin_movimentacoes_debito').delete().eq('id', id);
+            if (error) return alert(error.message);
+            await carregarDebitos();
+            await carregarDashboard();
+        }
+
+        // OUTROS GASTOS
+        async function salvarOutrosGastos() {
+            const desc = document.getElementById('descOutros').value.trim();
+            const val = Number(document.getElementById('valorOutros').value);
+            const data = document.getElementById('dataOutros').value;
+
+            if (!desc || val <= 0 || !data) return alert('Preencha todos os campos.');
+
+            const { error } = await supabaseClient.from('fin_outros_gastos').insert({
+                descricao: desc,
+                valor: val,
+                data_gasto: data
+            });
+
+            if (error) return alert(error.message);
+
+            alert('Gasto cadastrado!');
+            document.getElementById('descOutros').value = '';
+            document.getElementById('valorOutros').value = '';
+            await carregarOutrosGastos();
+            await carregarDashboard();
+        }
+
+        async function carregarOutrosGastos() {
+            const { data, error } = await supabaseClient.from('fin_outros_gastos').select('*').order('data_gasto', { ascending: false });
+            if (error || !data) return;
+            const tb = document.getElementById('tbOutrosGastos');
+            if (!tb) return;
+
+            tb.innerHTML = data.map(item => `
+                <tr>
+                    <td>${formatarData(item.data_gasto)}</td>
+                    <td>${item.descricao}</td>
+                    <td>${moeda(item.valor)}</td>
+                    <td><button class="btn btn-danger btn-sm" onclick="excluirOutrosGastos(${item.id})">Excluir</button></td>
+                </tr>
+            `).join('');
+        }
+
+        async function excluirOutrosGastos(id) {
+            if (!confirm('Excluir este gasto?')) return;
+            await supabaseClient.from('fin_outros_gastos').delete().eq('id', id);
+            await carregarOutrosGastos();
+            await carregarDashboard();
+        }
+
+        // ORÇAMENTOS
+        async function carregarOrcamentosTela() {
+            const { data } = await supabaseClient.from('vw_fin_orcamento_vs_realizado').select('*');
+            if (!data) return;
+            tbOrcamentosTela.innerHTML = data.map(item => `
+                <tr><td>${item.categoria}</td><td>${moeda(item.valor_planejado)}</td><td>${moeda(item.valor_realizado)}</td>
+                <td><span class="badge bg-${item.percentual_utilizado >= 100 ? 'danger' : item.percentual_utilizado >= 80 ? 'warning' : 'success'}">${item.percentual_utilizado}%</span></td></tr>
+            `).join('');
+        }
+
+        // INVESTIMENTOS
+        async function salvarInvestimento() {
+            const ticker = document.getElementById('tickerInvestimento').value.trim().toUpperCase();
+            const tipo = document.getElementById('tipoInvestimento').value;
+            const qtd = Number(document.getElementById('qtdInvestimento').value);
+            const valorAplicado = Number(document.getElementById('valorInvestimento').value);
+            const valorAtualUn = Number(document.getElementById('valorAtualUnitario').value) || (valorAplicado / (qtd || 1));
+
+            if (!ticker || qtd <= 0 || valorAplicado <= 0) return alert('Preencha os campos obrigatórios corretamente.');
+
+            const saldoInicial = qtd * valorAtualUn;
+
+            const { error } = await supabaseClient.from('investimentos').insert({
+                nome: ticker,
+                tipo: tipo,
+                quantidade: qtd,
+                valor_aplicado: valorAplicado,
+                valor_atual_unitario: valorAtualUn,
+                saldo_atual: saldoInicial,
+                data_aplicacao: new Date().toISOString().split('T')[0]
+            });
+
+            if (error) return alert('Erro ao salvar investimento: ' + error.message);
+
+            alert('Investimento cadastrado com sucesso!');
+            document.getElementById('tickerInvestimento').value = '';
+            document.getElementById('qtdInvestimento').value = '1';
+            document.getElementById('valorInvestimento').value = '';
+            document.getElementById('valorAtualUnitario').value = '';
+            await carregarInvestimentos();
+        }
+
+        async function carregarInvestimentos() {
+            const { data, error } = await supabaseClient.from('investimentos').select('*').order('nome');
+            if (error || !data) return;
+            const tb = document.getElementById('tbInvestimentos');
+            if (!tb) return;
+
+            if (data.length === 0) {
+                tb.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Neste momento não existem investimentos cadastrados.</td></tr>';
+                return;
+            }
+
+            tb.innerHTML = data.map(item => {
+                const precoUnAtual = item.valor_atual_unitario || (item.quantidade ? item.saldo_atual / item.quantidade : 0);
+                const saldoTotal = item.quantidade * precoUnAtual;
+                const diferenca = saldoTotal - item.valor_aplicado;
+                const percentual = item.valor_aplicado > 0 ? (diferenca / item.valor_aplicado) * 100 : 0;
+                
+                const corLucro = diferenca >= 0 ? 'text-success' : 'text-danger';
+                const sinal = diferenca >= 0 ? '+' : '';
+
+                return `
+                    <tr>
+                        <td class="fw-bold">${item.nome}</td>
+                        <td><span class="badge bg-secondary">${item.tipo}</span></td>
+                        <td>${item.quantidade}</td>
+                        <td>${moeda(item.valor_aplicado)}</td>
+                        <td>${moeda(precoUnAtual)}</td>
+                        <td class="fw-bold">${moeda(saldoTotal)}</td>
+                        <td class="${corLucro} fw-bold">
+                            ${sinal}${moeda(diferenca)} (${sinal}${percentual.toFixed(2)}%)
+                        </td>
+                        <td><button class="btn btn-danger btn-sm" onclick="excluirInvestimento(${item.id})">Excluir</button></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function atualizarCotacoesBrapi() {
+            const { data, error } = await supabaseClient.from('investimentos').select('*');
+            if (error || !data || data.length === 0) return alert('Nenhum investimento cadastrado para atualizar.');
+
+            const ativosParaAtualizar = data.filter(i => i.tipo !== 'Renda Fixa');
+            if (ativosParaAtualizar.length === 0) return alert('Apenas ativos de Renda Fixa cadastrados.');
+
+            try {
+                const tokenBrapi = "vjeX1w31CVy553VToQa99J";
+                let atualizados = 0;
+
+                for (let item of ativosParaAtualizar) {
+                    const ticker = item.nome.trim();
+                    const url = `https://brapi.dev/api/quote/${ticker}?token=${tokenBrapi}`;
+                    
+                    const response = await fetch(url);
+                    const resultado = await response.json();
+
+                    if (resultado && resultado.results && resultado.results.length > 0) {
+                        const cotacaoAtual = resultado.results[0].regularMarketPrice;
+
+                        if (typeof cotacaoAtual === 'number') {
+                            const novoSaldo = item.quantidade * cotacaoAtual;
+                            await supabaseClient.from('investimentos')
+                                .update({ 
+                                    valor_atual_unitario: cotacaoAtual,
+                                    saldo_atual: novoSaldo 
+                                })
+                                .eq('id', item.id);
+                            atualizados++;
+                        }
+                    }
+                    
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                }
+                
+                alert(`Cotações atualizadas com sucesso para ${atualizados} de ${ativosParaAtualizar.length} ativo(s)!`);
+                await carregarInvestimentos();
+                if (typeof carregarDashboard === 'function') carregarDashboard();
+
+            } catch (e) {
+                console.error('Erro ao consultar Brapi:', e);
+                alert('Erro de conexão ao buscar cotações na Brapi.');
+            }
+        }
+
+        async function excluirInvestimento(id) {
+            if (!confirm('Deseja excluir este investimento?')) return;
+            await supabaseClient.from('investimentos').delete().eq('id', id);
+            await carregarInvestimentos();
+        }
+
+        // RECEITAS
+        async function salvarReceita() {
+            const desc = document.getElementById('descReceita').value.trim();
+            const valor = Number(document.getElementById('valorReceita').value);
+            const data = document.getElementById('dataReceita').value;
+
+            if (!desc || valor <= 0 || !data) return alert('Preencha a descrição, valor e data da receita.');
+
+            const { error } = await supabaseClient.from('fin_receitas').insert({
+                descricao: desc,
+                valor: valor,
+                data_recebimento: data
+            });
+
+            if (error) return alert('Erro ao salvar receita: ' + error.message);
+
+            alert('Receita cadastrada com sucesso!');
+            document.getElementById('descReceita').value = '';
+            document.getElementById('valorReceita').value = '';
+            await carregarReceitas();
+            await carregarDashboard();
+        }
+
+        async function carregarReceitas() {
+            const { data, error } = await supabaseClient.from('fin_receitas').select('*').order('data_recebimento', { ascending: false });
+            if (error || !data) return;
+            const tb = document.getElementById('tbReceitas');
+            if (!tb) return;
+
+            tb.innerHTML = data.map(item => `
+                <tr>
+                    <td>${formatarData(item.data_recebimento)}</td>
+                    <td>${item.descricao}</td>
+                    <td class="text-success fw-bold">+ ${moeda(item.valor)}</td>
+                    <td><button class="btn btn-danger btn-sm" onclick="excluirReceita(${item.id})">Excluir</button></td>
+                </tr>
+            `).join('');
+        }
+
+        async function excluirReceita(id) {
+            if (!confirm('Deseja excluir esta receita?')) return;
+            const { error } = await supabaseClient.from('fin_receitas').delete().eq('id', id);
+            if (error) return alert(error.message);
+            await carregarReceitas();
+            await carregarDashboard();
+        }
+    </script>
+</body>
+
+</html>
