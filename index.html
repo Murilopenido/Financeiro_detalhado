@@ -53,7 +53,7 @@
             font-size: 14px;
         }
 
-        .sidebar-menu a:hover {
+        .sidebar-menu a:hover, .sidebar-menu a.active {
             background: #334155;
         }
 
@@ -69,7 +69,7 @@
         }
 
         .chart-card {
-            min-height: 420px;
+            min-height: 380px;
         }
 
         .menu-toggle {
@@ -155,32 +155,142 @@
 
         <!-- TELA 1: DASHBOARD -->
         <div id="dashboardTela">
-            <h2 class="mb-4">Dashboard Financeiro</h2>
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <h2>Dashboard Financeiro</h2>
+                <div class="d-flex align-items-center gap-2">
+                    <label for="filtroMesDashboard" class="form-label mb-0 fw-bold text-nowrap"><i class="bi bi-calendar-event"></i> Filtrar Mês:</label>
+                    <input type="month" id="filtroMesDashboard" class="form-control" onchange="carregarDashboard()">
+                </div>
+            </div>
+
+            <!-- CARDS DE RESUMO -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <div class="card dashboard-card bg-primary text-white">
+                        <div class="card-body">
+                            <small>Saldo Atual (Líquido)</small>
+                            <h3 id="saldoAtual" class="mt-1">R$ 0,00</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card dashboard-card border-start border-success border-4">
+                        <div class="card-body">
+                            <small class="text-muted fw-bold">Total Receitas</small>
+                            <h3 id="totalReceitas" class="text-success mt-1">R$ 0,00</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card dashboard-card border-start border-danger border-4">
+                        <div class="card-body">
+                            <small class="text-muted fw-bold">Total Despesas (Consolidado)</small>
+                            <h3 id="totalDespesas" class="text-danger mt-1">R$ 0,00</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DETALHAMENTO DE DESPESAS -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="card dashboard-card">
+                        <div class="card-body">
+                            <small class="text-muted">Crédito (Parcelas do Mês)</small>
+                            <h4 id="totalCredito" class="mt-1">R$ 0,00</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card dashboard-card">
+                        <div class="card-body">
+                            <small class="text-muted">Débito / Pix</small>
+                            <h4 id="totalDebito" class="mt-1">R$ 0,00</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card dashboard-card">
+                        <div class="card-body">
+                            <small class="text-muted">Outros Gastos</small>
+                            <h4 id="outrosGastos" class="mt-1">R$ 0,00</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card dashboard-card bg-dark text-white">
+                        <div class="card-body">
+                            <small>Próxima Fatura</small>
+                            <h4 id="proximaFatura" class="mt-1">R$ 0,00</h4>
+                            <div id="competenciaFatura" class="small opacity-75"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EVOLUÇÃO MENSAL -->
             <div class="row g-3">
-                <div class="col-md-3"><div class="card dashboard-card"><div class="card-body"><small class="text-muted">Saldo Atual</small><h3 id="saldoAtual">R$ 0,00</h3></div></div></div>
-                <div class="col-md-3"><div class="card dashboard-card"><div class="card-body"><small class="text-muted">Receitas</small><h3 id="totalReceitas">R$ 0,00</h3></div></div></div>
-                <div class="col-md-3"><div class="card dashboard-card"><div class="card-body"><small class="text-muted">Despesas</small><h3 id="totalDespesas">R$ 0,00</h3></div></div></div>
-                <div class="col-md-3"><div class="card dashboard-card"><div class="card-body"><small class="text-muted">Parcelas</small><h3 id="parcelasAbertas">0</h3></div></div></div>
-            </div>
-
-            <div class="row mt-3 g-3">
-                <div class="col-md-3"><div class="card dashboard-card"><div class="card-body"><small class="text-muted">Total Crédito</small><h4 id="totalCredito">R$ 0,00</h4></div></div></div>
-                <div class="col-md-3"><div class="card dashboard-card"><div class="card-body"><small class="text-muted">Total Débito</small><h4 id="totalDebito">R$ 0,00</h4></div></div></div>
-                <div class="col-md-3"><div class="card dashboard-card"><div class="card-body"><small class="text-muted">Outros Gastos</small><h4 id="outrosGastos">R$ 0,00</h4></div></div></div>
-                <div class="col-md-3"><div class="card dashboard-card bg-primary text-white"><div class="card-body"><small>Próxima Fatura</small><h4 id="proximaFatura">R$ 0,00</h4><div id="competenciaFatura"></div></div></div></div>
-            </div>
-
-            <div class="row mt-4 g-3">
-                <div class="col-lg-6"><div class="card dashboard-card chart-card"><div class="card-header bg-white fw-bold">Gastos por Categoria</div><div class="card-body"><canvas id="graficoCategorias"></canvas></div></div></div>
-                <div class="col-lg-6"><div class="card dashboard-card chart-card"><div class="card-header bg-white fw-bold">Evolução Mensal</div><div class="card-body"><canvas id="graficoMensal"></canvas></div></div></div>
+                <div class="col-12">
+                    <div class="card dashboard-card chart-card">
+                        <div class="card-header bg-white fw-bold"><i class="bi bi-bar-chart-line"></i> Evolução Mensal dos Gastos</div>
+                        <div class="card-body"><canvas id="graficoMensal" style="max-height: 300px;"></canvas></div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- TELA 2: COMPRAS CRÉDITO -->
+        <!-- TELA 2: COMPRAS CRÉDITO & CARTÕES -->
         <div id="comprasCredito" style="display:none;">
-            <!-- CARD DE CADASTRO -->
+            <!-- GESTÃO DE CARTÕES -->
             <div class="card dashboard-card mb-4">
-                <div class="card-header bg-white fw-bold">Cadastro de Compras no Crédito</div>
+                <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
+                    <span>💳 Gerenciar Cartões de Crédito</span>
+                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#collapseCartoes">Expandir / Ocultar</button>
+                </div>
+                <div class="card-body collapse show" id="collapseCartoes">
+                    <input type="hidden" id="idCartaoEditando">
+                    <div class="row g-3 align-items-end mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Nome do Cartão</label>
+                            <input type="text" id="novoNomeCartao" class="form-control" placeholder="Ex: Nubank, Itaú, Inter">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Limite (R$)</label>
+                            <input type="number" step="0.01" id="novoLimiteCartao" class="form-control" placeholder="0,00">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Dia Fechamento</label>
+                            <input type="number" min="1" max="31" id="novoFechamentoCartao" class="form-control" placeholder="Ex: 25">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Dia Vencimento</label>
+                            <input type="number" min="1" max="31" id="novoVencimentoCartao" class="form-control" placeholder="Ex: 1">
+                        </div>
+                        <div class="col-md-2 d-flex gap-1">
+                            <button class="btn btn-success w-100" id="btnSalvarCartao" onclick="salvarCartao()"><i class="bi bi-plus-circle"></i> Salvar</button>
+                            <button class="btn btn-secondary" id="btnCancelarCartao" style="display:none;" onclick="cancelarEdicaoCartao()">X</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Cartão</th>
+                                    <th>Limite</th>
+                                    <th>Fechamento</th>
+                                    <th>Vencimento</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbCartoesGestao"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD DE CADASTRO DE COMPRA -->
+            <div class="card dashboard-card mb-4">
+                <div class="card-header bg-white fw-bold">🛒 Cadastro de Compras no Crédito</div>
                 <div class="card-body">
                     <div class="row g-3">
                         <div class="col-md-3"><label class="form-label">Cartão</label><select id="cartao" class="form-select"></select></div>
@@ -195,20 +305,66 @@
                 </div>
             </div>
 
-            <!-- CARD DE FILTROS E LISTAGEM -->
+            <!-- GRÁFICO POR CATEGORIA -->
+            <div class="row mb-4">
+                <div class="col-lg-6 mx-auto">
+                    <div class="card dashboard-card">
+                        <div class="card-header bg-white fw-bold"><i class="bi bi-pie-chart"></i> Gastos por Categoria no Crédito</div>
+                        <div class="card-body">
+                            <canvas id="graficoCategorias" style="max-height: 280px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD DE FILTROS E LISTAGEM DE COMPRAS -->
             <div class="card dashboard-card">
-                <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
+                <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <span>Compras Cadastradas</span>
-                    <button class="btn btn-sm btn-outline-secondary" onclick="limparFiltrosCompras()">Limpar Filtros</button>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-danger" id="btnExcluirSelecionadosCompras" style="display:none;" onclick="excluirComprasEmMassa()"><i class="bi bi-trash"></i> Excluir Selecionadas (<span id="qtdComprasSelecionadas">0</span>)</button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="limparFiltrosCompras()">Limpar Filtros</button>
+                    </div>
                 </div>
                 <div class="card-body">
-                    <!-- BARRA DE FILTROS -->
+                    <!-- CARDS DE TOTALIZADORES DAS COMPRAS / FATURA -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <div class="card dashboard-card bg-primary text-white">
+                                <div class="card-body">
+                                    <small class="opacity-75">Total Consolidado (Geral)</small>
+                                    <h4 id="totalGeralCompras" class="mt-1 mb-0">R$ 0,00</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card dashboard-card bg-dark text-white">
+                                <div class="card-body">
+                                    <small class="opacity-75" id="labelTotalCartao">Total Cartão (Todos)</small>
+                                    <h4 id="totalCartaoSelecionado" class="mt-1 mb-0">R$ 0,00</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card dashboard-card bg-success text-white">
+                                <div class="card-body">
+                                    <small class="opacity-75" id="labelTotalFatura">Total Fatura (Todas)</small>
+                                    <h4 id="totalFaturaSelecionada" class="mt-1 mb-0">R$ 0,00</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row g-3 mb-3 bg-light p-3 rounded">
                         <div class="col-md-3">
                             <label class="form-label fw-bold"><i class="bi bi-credit-card"></i> Filtrar por Cartão</label>
                             <select id="filtroCartao" class="form-select" onchange="aplicarFiltrosCompras()">
                                 <option value="">Todos os Cartões</option>
                             </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold"><i class="bi bi-calendar-check"></i> Mês Vencimento Fatura</label>
+                            <input type="month" id="filtroMesVencimento" class="form-control" onchange="aplicarFiltrosCompras()">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label fw-bold"><i class="bi bi-tags"></i> Filtrar por Categoria</label>
@@ -220,18 +376,15 @@
                             <label class="form-label fw-bold"><i class="bi bi-calendar-month"></i> Mês da Compra</label>
                             <input type="month" id="filtroMesAno" class="form-control" onchange="aplicarFiltrosCompras()">
                         </div>
-                        <div class="col-md-3 d-flex align-items-end">
-                            <span id="contadorComprasFiltro" class="text-muted small"></span>
-                        </div>
                     </div>
 
-                    <!-- TABELA -->
                     <div class="table-responsive">
                         <table class="table align-middle">
                             <thead>
                                 <tr>
+                                    <th style="width: 40px;"><input type="checkbox" id="checkTodasCompras" class="form-check-input" onchange="selecionarTodasCompras(this)"></th>
                                     <th>Data Compra</th>
-                                    <th>Data Cadastro</th>
+                                    <th>Vencimento Fatura</th>
                                     <th>Descrição</th>
                                     <th>Cartão</th>
                                     <th>Categoria</th>
@@ -250,12 +403,76 @@
         <!-- TELA 3: PARCELAS E FATURAS -->
         <div id="parcelasTela" style="display:none;">
             <div class="card dashboard-card mb-4">
-                <div class="card-header bg-white fw-bold">Parcelas em Aberto</div>
-                <div class="card-body table-responsive">
-                    <table class="table align-middle">
-                        <thead><tr><th>Compra</th><th>Parcela</th><th>Vencimento</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead>
-                        <tbody id="tbParcelasTela"></tbody>
-                    </table>
+                <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <span>📦 Gestão de Parcelas & Faturas</span>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-danger" id="btnExcluirSelecionadosParcelas" style="display:none;" onclick="excluirParcelasEmMassa()"><i class="bi bi-trash"></i> Excluir Selecionadas (<span id="qtdParcelasSelecionadas">0</span>)</button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="limparFiltrosParcelas()">Limpar Filtros</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- RESUMO TOTALIZADOR -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="card dashboard-card bg-primary text-white">
+                                <div class="card-body">
+                                    <small class="opacity-75">Total Valor (Filtrado)</small>
+                                    <h4 id="totalValorParcelas" class="mt-1 mb-0">R$ 0,00</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card dashboard-card bg-dark text-white">
+                                <div class="card-body">
+                                    <small class="opacity-75">Quantidade de Parcelas</small>
+                                    <h4 id="qtdParcelasFiltradas" class="mt-1 mb-0">0</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BARRA DE FILTROS DAS PARCELAS -->
+                    <div class="row g-3 mb-3 bg-light p-3 rounded">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold"><i class="bi bi-filter-circle"></i> Tipo de Compra</label>
+                            <select id="filtroTipoParcela" class="form-select" onchange="aplicarFiltrosParcelas()">
+                                <option value="">Todas (À vista e Parceladas)</option>
+                                <option value="parceladas">Apenas Compras Parceladas (> 1x)</option>
+                                <option value="avista">Apenas À Vista / 1x</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold"><i class="bi bi-check2-circle"></i> Status da Parcela</label>
+                            <select id="filtroStatusParcela" class="form-select" onchange="aplicarFiltrosParcelas()">
+                                <option value="">Todos os Status</option>
+                                <option value="abertas" selected>Apenas em Aberto</option>
+                                <option value="pagas">Apenas Pagas</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold"><i class="bi bi-calendar-event"></i> Mês Vencimento</label>
+                            <input type="month" id="filtroMesVencimentoParcelas" class="form-control" onchange="aplicarFiltrosParcelas()">
+                        </div>
+                    </div>
+
+                    <!-- GRÁFICO DE CATEGORIAS DAS PARCELAS -->
+                    <div class="row mb-4">
+                        <div class="col-lg-6 mx-auto">
+                            <div class="card dashboard-card">
+                                <div class="card-header bg-white fw-bold text-center"><i class="bi bi-pie-chart-fill"></i> Distribuição das Parcelas por Categoria</div>
+                                <div class="card-body">
+                                    <canvas id="graficoCategoriasParcelas" style="max-height: 280px;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead><tr><th style="width: 40px;"><input type="checkbox" id="checkTodasParcelas" class="form-check-input" onchange="selecionarTodasParcelas(this)"></th><th>Compra</th><th>Parcela</th><th>Vencimento</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead>
+                            <tbody id="tbParcelasTela"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
             <div class="card dashboard-card">
@@ -295,11 +512,15 @@
             </div>
 
             <div class="card dashboard-card">
-                <div class="card-header bg-white fw-bold">Histórico de Débitos / Pix</div>
+                <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <span>Histórico de Débitos / Pix</span>
+                    <button class="btn btn-sm btn-danger" id="btnExcluirSelecionadosDebitos" style="display:none;" onclick="excluirDebitosEmMassa()"><i class="bi bi-trash"></i> Excluir Selecionados (<span id="qtdDebitosSelecionados">0</span>)</button>
+                </div>
                 <div class="card-body table-responsive">
                     <table class="table align-middle">
                         <thead>
                             <tr>
+                                <th style="width: 40px;"><input type="checkbox" id="checkTodosDebitos" class="form-check-input" onchange="selecionarTodosDebitos(this)"></th>
                                 <th>Data</th>
                                 <th>Descrição</th>
                                 <th>Valor</th>
@@ -342,6 +563,7 @@
                     <table class="table align-middle">
                         <thead>
                             <tr>
+                                <th style="width: 40px;"><input type="checkbox" id="checkTodosDebitos" class="form-check-input" onchange="selecionarTodosDebitos(this)"></th>
                                 <th>Data</th>
                                 <th>Descrição</th>
                                 <th>Valor</th>
@@ -354,71 +576,171 @@
             </div>
         </div>
 
-        <!-- TELA 6: ORÇAMENTOS -->
+        <!-- TELA 6: ORÇAMENTOS (COM CADASTRO, EDIÇÃO E EXCLUSÃO) -->
         <div id="orcamentosTela" style="display:none;">
-            <div class="card dashboard-card">
-                <div class="card-header bg-white fw-bold">🎯 Orçamento x Realizado por Categoria</div>
-                <div class="card-body table-responsive">
-                    <table class="table align-middle">
-                        <thead><tr><th>Categoria</th><th>Planejado</th><th>Realizado</th><th>% Utilizado</th></tr></thead>
-                        <tbody id="tbOrcamentosTela"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- TELA 7: INVESTIMENTOS & AÇÕES -->
-        <div id="investimentosTela" style="display:none;">
+            <!-- FORMULÁRIO DE CADASTRO/EDIÇÃO DE ORÇAMENTO -->
             <div class="card dashboard-card mb-4">
-                <div class="card-header bg-white fw-bold">📈 Gestão de Investimentos & Ações</div>
+                <div class="card-header bg-white fw-bold" id="tituloFormOrcamento">🎯 Cadastrar / Editar Orçamento</div>
                 <div class="card-body">
+                    <input type="hidden" id="idOrcamentoEditando">
                     <div class="row g-3">
-                        <div class="col-md-3 position-relative">
-                            <label class="form-label">Ativo / Ticker ou Empresa</label>
-                            <input type="text" id="tickerInvestimento" class="form-control" placeholder="Ex: PETR4 ou Banco do Brasil..." autocomplete="off">
-                            <div id="sugestoesAcoes" class="autocomplete-sugestoes"></div>
+                        <div class="col-md-4">
+                            <label class="form-label">Categoria</label>
+                            <select id="categoriaOrcamento" class="form-select"></select>
                         </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Tipo</label>
-                            <select id="tipoInvestimento" class="form-select">
-                                <option value="Ação">Ação</option>
-                                <option value="FII">Fundo Imobiliário (FII)</option>
-                                <option value="Renda Fixa">Renda Fixa</option>
-                            </select>
+                        <div class="col-md-4">
+                            <label class="form-label">Valor Planejado (R$)</label>
+                            <input type="number" step="0.01" id="valorPlanejadoOrcamento" class="form-control" placeholder="0,00">
                         </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Quantidade</label>
-                            <input type="number" step="0.01" id="qtdInvestimento" class="form-control" value="1">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Valor Aplicado (Total)</label>
-                            <input type="number" step="0.01" id="valorInvestimento" class="form-control" placeholder="0,00">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Valor Atual (Unit.)</label>
-                            <input type="number" step="0.01" id="valorAtualUnitario" class="form-control" placeholder="Opcional">
-                        </div>
-                        <div class="col-md-1 d-flex align-items-end">
-                            <button class="btn btn-primary w-100" onclick="salvarInvestimento()">Adicionar</button>
+                        <div class="col-md-4 d-flex align-items-end gap-2">
+                            <button class="btn btn-primary w-100" id="btnSalvarOrcamento" onclick="salvarOrcamento()">Salvar Orçamento</button>
+                            <button class="btn btn-secondary" id="btnCancelarOrcamento" style="display:none;" onclick="cancelarEdicaoOrcamento()">Cancelar</button>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="card dashboard-card">
+                <div class="card-header bg-white fw-bold">Orçamento x Realizado por Categoria</div>
+                <div class="card-body table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Categoria</th>
+                                <th>Planejado</th>
+                                <th>Realizado</th>
+                                <th>% Utilizado</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbOrcamentosTela"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA 7: INVESTIMENTOS & AÇÕES (FLUXO ADAPTATIVO POR TIPO) -->
+        <div id="investimentosTela" style="display:none;">
+            <!-- CARDS DE RESUMO TOTAL DA CARTEIRA -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="card dashboard-card bg-primary text-white">
+                        <div class="card-body">
+                            <small class="opacity-75">Saldo Total Atualizado</small>
+                            <h3 id="saldoTotalInvestimentos" class="mt-1 mb-0">R$ 0,00</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card dashboard-card border-start border-primary border-4">
+                        <div class="card-body">
+                            <small class="text-muted fw-bold">Total Aplicado</small>
+                            <h3 id="totalAplicadoInvestimentos" class="text-dark mt-1 mb-0">R$ 0,00</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card dashboard-card border-start border-success border-4" id="cardLucroTotalInvestimentos">
+                        <div class="card-body">
+                            <small class="text-muted fw-bold">Lucro / Prejuízo Total</small>
+                            <h3 id="lucroTotalInvestimentos" class="text-success mt-1 mb-0">R$ 0,00 (+0,00%)</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card dashboard-card mb-4">
+                <div class="card-header bg-white fw-bold">📈 Cadastrar Investimento</div>
+                <div class="card-body">
+                    <!-- PASSO 1: ESCOLHER TIPO -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">1. Escolha o Tipo de Investimento</label>
+                            <select id="tipoInvestimento" class="form-select" onchange="alternarCamposInvestimento()">
+                                <option value="Ação">Ação (B3)</option>
+                                <option value="FII">Fundo Imobiliário (FII)</option>
+                                <option value="CDB">CDB</option>
+                                <option value="LCI">LCI</option>
+                                <option value="LCA">LCA</option>
+                                <option value="Tesouro Direto">Tesouro Direto</option>
+                                <option value="Renda Fixa Outros">Outra Renda Fixa</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- PASSO 2: FORMULÁRIO DINÂMICO -->
+                    <!-- PAINEL PARA VARIABLE (AÇÕES / FIIS) -->
+                    <div id="painelVariavel" class="row g-3">
+                        <div class="col-md-3 position-relative">
+                            <label class="form-label">Ativo / Ticker ou Empresa</label>
+                            <input type="text" id="tickerInvestimento" class="form-control" placeholder="Ex: PETR4 ou Banco do Brasil..." autocomplete="off">
+                            <div id="sugestoesAcoes" class="autocomplete-sugestoes"></div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Quantidade</label>
+                            <input type="number" step="0.01" id="qtdInvestimento" class="form-control" value="1">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Valor Aplicado (Total R$)</label>
+                            <input type="number" step="0.01" id="valorInvestimento" class="form-control" placeholder="0,00">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Preço Atual (Un. R$)</label>
+                            <input type="number" step="0.01" id="valorAtualUnitario" class="form-control" placeholder="Opcional">
+                        </div>
+                    </div>
+
+                    <!-- PAINEL PARA RENDA FIXA (CDB / TESOURO / RENDA FIXA) -->
+                    <div id="painelRendaFixa" class="row g-3" style="display:none;">
+                        <div class="col-md-3">
+                            <label class="form-label">Nome do Titulo / Emissor</label>
+                            <input type="text" id="nomeRendaFixa" class="form-control" placeholder="Ex: CDB Banco Inter 110% CDI">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Valor Aplicado (R$)</label>
+                            <input type="number" step="0.01" id="valorRendaFixa" class="form-control" placeholder="1000,00">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Tipo de Indexador / Rendimento</label>
+                            <select id="indexadorRendaFixa" class="form-select">
+                                <option value="CDI">% do CDI</option>
+                                <option value="FIXA">Taxa Fixa Pré-fixada (% a.a.)</option>
+                                <option value="IPCA">IPCA + % a.a.</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Taxa (% a.a. ou % do CDI)</label>
+                            <input type="number" step="0.01" id="taxaRendaFixa" class="form-control" placeholder="Ex: 100 para CDI, 12 para Pré">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Data da Aplicação</label>
+                            <input type="date" id="dataAplicacaoRendaFixa" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-3">
+                            <button class="btn btn-primary w-100" onclick="salvarInvestimento()"><i class="bi bi-plus-circle"></i> Adicionar Investimento</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARTEIRA DE INVESTIMENTOS -->
+            <div class="card dashboard-card">
                 <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
                     <span>Minha Carteira</span>
-                    <button class="btn btn-sm btn-outline-success" onclick="atualizarCotacoesBrapi()">Atualizar Cotações (Brapi)</button>
+                    <button class="btn btn-sm btn-outline-success" onclick="atualizarCotacoesBrapi()"><i class="bi bi-arrow-repeat"></i> Atualizar Cotações (Brapi)</button>
                 </div>
                 <div class="card-body table-responsive">
                     <table class="table align-middle">
                         <thead>
                             <tr>
-                                <th>Ativo</th>
+                                <th>Ativo / Título</th>
                                 <th>Tipo</th>
-                                <th>Qtd</th>
+                                <th>Qtd / Taxa</th>
                                 <th>Valor Aplicado</th>
-                                <th>Preço Atual (Un.)</th>
+                                <th>Preço Un. / Estimado</th>
                                 <th>Saldo Atual</th>
                                 <th>Lucro / Prejuízo</th>
                                 <th>Ações</th>
@@ -461,6 +783,7 @@
                     <table class="table align-middle">
                         <thead>
                             <tr>
+                                <th style="width: 40px;"><input type="checkbox" id="checkTodosDebitos" class="form-check-input" onchange="selecionarTodosDebitos(this)"></th>
                                 <th>Data</th>
                                 <th>Descrição</th>
                                 <th>Valor</th>
@@ -475,12 +798,18 @@
 
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const SUPABASE_URL = "https://ykskyuxsexfhwbdejxqy.supabase.co";
         const SUPABASE_KEY = "sb_publishable_bWsaR67hlPqsx9v0e9MLYQ__g8SY8_r";
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let listaTodasCompras = [];
+        let chartCategoriasInstance = null;
+        let chartCategoriasParcelasInstance = null;
+        let chartMensalInstance = null;
+        let mapaCartoesGlobal = {};
+        let mapaCategoriasGlobal = {};
 
         function moeda(valor) {
             return Number(valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -488,7 +817,7 @@
 
         function formatarData(dataIso) {
             if (!dataIso) return '';
-            const partes = dataIso.split('-');
+            const partes = dataIso.split('T')[0].split('-');
             if (partes.length !== 3) return dataIso;
             return `${partes[2]}/${partes[1]}/${partes[0]}`;
         }
@@ -509,13 +838,13 @@
             const tela = document.getElementById(nomeTela);
             if (tela) tela.style.display = 'block';
 
-            if (nomeTela === 'dashboardTela') { carregarDashboard(); carregarFatura(); }
-            if (nomeTela === 'comprasCredito') { carregarCartoes(); carregarCategorias(); carregarCompras(); }
+            if (nomeTela === 'dashboardTela') { carregarDashboard(); carregarFatura(); carregarGraficoMensal(); }
+            if (nomeTela === 'comprasCredito') { carregarCartoes(); carregarCategorias(); carregarCompras(); carregarGraficoCategorias(); carregarGestaoCartoes(); }
             if (nomeTela === 'parcelasTela') { carregarParcelasTela(); carregarFaturas(); }
             if (nomeTela === 'debitoTela') { carregarDebitos(); }
             if (nomeTela === 'outrosGastosTela') { carregarOutrosGastos(); }
-            if (nomeTela === 'orcamentosTela') { carregarOrcamentosTela(); }
-            if (nomeTela === 'investimentosTela') { carregarInvestimentos(); }
+            if (nomeTela === 'orcamentosTela') { carregarCategoriasParaOrcamento(); carregarOrcamentosTela(); }
+            if (nomeTela === 'investimentosTela') { alternarCamposInvestimento(); carregarInvestimentos(); }
             if (nomeTela === 'receitasTela') {
                 carregarReceitas();
                 const inputData = document.getElementById('dataReceita');
@@ -540,7 +869,7 @@
             { ticker: "XPML11", nome: "FII XP Malls" }
         ];
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             const inputNome = document.getElementById('tickerInvestimento');
             const divSugestoes = document.getElementById('sugestoesAcoes');
 
@@ -568,13 +897,18 @@
                 });
             }
 
-            if (document.getElementById('dataCompra')) document.getElementById('dataCompra').value = new Date().toISOString().split('T')[0];
-            if (document.getElementById('dataDebito')) document.getElementById('dataDebito').value = new Date().toISOString().split('T')[0];
-            if (document.getElementById('dataOutros')) document.getElementById('dataOutros').value = new Date().toISOString().split('T')[0];
+            const hojeStr = new Date().toISOString().split('T')[0];
+            if (document.getElementById('dataCompra')) document.getElementById('dataCompra').value = hojeStr;
+            if (document.getElementById('dataDebito')) document.getElementById('dataDebito').value = hojeStr;
+            if (document.getElementById('dataOutros')) document.getElementById('dataOutros').value = hojeStr;
+            if (document.getElementById('dataAplicacaoRendaFixa')) document.getElementById('dataAplicacaoRendaFixa').value = hojeStr;
 
+            const mesAtual = new Date().toISOString().slice(0, 7);
+            if (document.getElementById('filtroMesDashboard')) document.getElementById('filtroMesDashboard').value = mesAtual;
+
+            await carregarFiltrosSelects();
             carregarDashboard();
             carregarFatura();
-            carregarGraficoCategorias();
             carregarGraficoMensal();
         });
 
@@ -585,45 +919,334 @@
             if (divSugestoes) divSugestoes.style.display = 'none';
         }
 
-        // DASHBOARD
+        // ================= DASHBOARD COM FILTRO DE MÊS =================
         async function carregarDashboard() {
-            const { data, error } = await supabaseClient.from('vw_fin_dashboard').select('*').single();
-            if (error || !data) return;
-            saldoAtual.textContent = moeda(data.saldo_atual);
-            totalReceitas.textContent = moeda(data.total_receitas);
-            totalDespesas.textContent = moeda(data.total_despesas);
-            totalCredito.textContent = moeda(data.total_credito);
-            totalDebito.textContent = moeda(data.total_debito);
-            outrosGastos.textContent = moeda(data.total_outros_gastos);
-            parcelasAbertas.textContent = data.qtd_parcelas_abertas;
+            const mesFiltro = document.getElementById('filtroMesDashboard') ? document.getElementById('filtroMesDashboard').value : '';
+
+            let inicio = '';
+            let fim = '';
+            if (mesFiltro) {
+                const [ano, mes] = mesFiltro.split('-');
+                inicio = `${ano}-${mes}-01`;
+                const ultimoDia = new Date(Number(ano), Number(mes), 0).getDate();
+                fim = `${ano}-${mes}-${String(ultimoDia).padStart(2, '0')}`;
+            }
+
+            // Busca Receitas
+            let queryReceitas = supabaseClient.from('fin_receitas').select('valor, data_recebimento');
+            if (mesFiltro) {
+                queryReceitas = queryReceitas.gte('data_recebimento', inicio).lte('data_recebimento', fim);
+            }
+            const { data: recData } = await queryReceitas;
+            const totalRec = (recData || []).reduce((acc, r) => acc + Number(r.valor || 0), 0);
+
+            // Busca Crédito
+            await carregarFiltrosSelects();
+            const { data: credData } = await supabaseClient.from('vw_fin_compras_credito').select('*');
+            let totalCred = 0;
+
+            (credData || []).forEach(item => {
+                const cartaoId = item.cartao_id || item.id_cartao;
+                const configCartao = mapaCartoesGlobal[cartaoId] || { dia_fechamento: 25, dia_vencimento: 1 };
+                const dtCompra = item.data_compra || item.dt_compra;
+                const qtdParcelas = Number(item.quantidade_parcelas || 1);
+                const valorParc = Number(item.valor_compra || 0) / qtdParcelas;
+
+                for (let i = 1; i <= qtdParcelas; i++) {
+                    const dtVencReal = calcularVencimentoFatura(dtCompra, configCartao.dia_fechamento, configCartao.dia_vencimento, i);
+                    if (mesFiltro) {
+                        const [ano, mes] = mesFiltro.split('-');
+                        if (dtVencReal && dtVencReal.startsWith(`${ano}-${mes}`)) {
+                            totalCred += valorParc;
+                        }
+                    } else {
+                        totalCred += valorParc;
+                    }
+                }
+            });
+
+            // Busca Débito
+            let queryDebito = supabaseClient.from('fin_movimentacoes_debito').select('valor, data_movimentacao');
+            if (mesFiltro) {
+                queryDebito = queryDebito.gte('data_movimentacao', inicio).lte('data_movimentacao', fim);
+            }
+            const { data: debData } = await queryDebito;
+            const totalDeb = (debData || []).reduce((acc, d) => acc + Number(d.valor || 0), 0);
+
+            // Busca Outros Gastos
+            let queryOutros = supabaseClient.from('fin_outros_gastos').select('valor, data_gasto');
+            if (mesFiltro) {
+                queryOutros = queryOutros.gte('data_gasto', inicio).lte('data_gasto', fim);
+            }
+            const { data: outrosData } = await queryOutros;
+            const totalOutrosVal = (outrosData || []).reduce((acc, o) => acc + Number(o.valor || 0), 0);
+
+            const totalDespConsolidado = totalCred + totalDeb + totalOutrosVal;
+            const saldoLiq = totalRec - totalDespConsolidado;
+
+            saldoAtual.textContent = moeda(saldoLiq);
+            totalReceitas.textContent = moeda(totalRec);
+            totalDespesas.textContent = moeda(totalDespConsolidado);
+            totalCredito.textContent = moeda(totalCred);
+            totalDebito.textContent = moeda(totalDeb);
+            outrosGastos.textContent = moeda(totalOutrosVal);
         }
 
         async function carregarFatura() {
-            const { data } = await supabaseClient.from('vw_fin_dashboard_proxima_fatura').select('*').single();
+            if (listaTodasParcelas && listaTodasParcelas.length > 0) {
+                processarProximaFaturaComDados(listaTodasParcelas);
+                return;
+            }
+
+            const { data } = await supabaseClient.from('vw_fin_compras_credito').select('*');
             if (!data) return;
-            proximaFatura.textContent = moeda(data.valor_fatura);
-            competenciaFatura.textContent = `${data.competencia_mes}/${data.competencia_ano}`;
+
+            let parcelasGeradas = [];
+            data.forEach(compra => {
+                const cartaoId = compra.cartao_id || compra.id_cartao;
+                const configCartao = mapaCartoesGlobal[cartaoId] || { dia_fechamento: 25, dia_vencimento: 1 };
+                const dtCompra = compra.data_compra || compra.dt_compra;
+                const totalParc = Number(compra.quantidade_parcelas || 1);
+                const valorUnicoParcela = Number(compra.valor_compra || 0) / totalParc;
+
+                for (let i = 1; i <= totalParc; i++) {
+                    const dtVenc = calcularVencimentoFatura(dtCompra, configCartao.dia_fechamento, configCartao.dia_vencimento, i);
+                    if (dtVenc) {
+                        parcelasGeradas.push({
+                            valor_parcela: valorUnicoParcela,
+                            data_vencimento: dtVenc,
+                            paga: false
+                        });
+                    }
+                }
+            });
+
+            processarProximaFaturaComDados(parcelasGeradas);
         }
 
-        async function carregarGraficoCategorias() {
-            const { data } = await supabaseClient.from('vw_fin_dashboard_categorias').select('*');
-            if (!data) return;
-            new Chart(document.getElementById('graficoCategorias'), {
-                type: 'pie',
-                data: { labels: data.map(x => x.categoria), datasets: [{ data: data.map(x => x.valor_total) }] }
+        function processarProximaFaturaComDados(parcelas) {
+            const hoje = new Date();
+            const anoAtual = hoje.getFullYear();
+            const mesAtual = String(hoje.getMonth() + 1).padStart(2, '0');
+            const referenciaAtualStr = `${anoAtual}-${mesAtual}`;
+
+            let faturasPorMes = {};
+
+            parcelas.forEach(p => {
+                if (!p.data_vencimento) return;
+                const [ano, mes] = p.data_vencimento.split('-');
+                const chave = `${ano}-${mes}`;
+                
+                if (!faturasPorMes[chave]) {
+                    faturasPorMes[chave] = { ano, mes, valor: 0 };
+                }
+                faturasPorMes[chave].valor += Number(p.valor_parcela || 0);
             });
+
+            const chavesOrdenadas = Object.keys(faturasPorMes).sort();
+            let chaveAlvo = chavesOrdenadas.find(c => c >= referenciaAtualStr) || chavesOrdenadas[0];
+
+            if (chaveAlvo && faturasPorMes[chaveAlvo]) {
+                const fat = faturasPorMes[chaveAlvo];
+                proximaFatura.textContent = moeda(fat.valor);
+                competenciaFatura.textContent = `${fat.mes}/${fat.ano}`;
+            } else {
+                proximaFatura.textContent = moeda(0);
+                competenciaFatura.textContent = '-';
+            }
         }
 
         async function carregarGraficoMensal() {
             const { data } = await supabaseClient.from('vw_fin_dashboard_mensal').select('*');
             if (!data) return;
-            new Chart(document.getElementById('graficoMensal'), {
+
+            const ctx = document.getElementById('graficoMensal');
+            if (!ctx) return;
+
+            if (chartMensalInstance) chartMensalInstance.destroy();
+
+            chartMensalInstance = new Chart(ctx, {
                 type: 'bar',
-                data: { labels: data.map(x => x.referencia), datasets: [{ label: 'Gastos', data: data.map(x => x.total), backgroundColor: '#2563eb' }] }
+                data: {
+                    labels: data.map(x => x.referencia),
+                    datasets: [{
+                        label: 'Total Gastos (R$)',
+                        data: data.map(x => x.total),
+                        backgroundColor: '#2563eb',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
             });
         }
 
-        // COMPRAS CRÉDITO
+        // ================= GESTÃO DE CARTÕES & COMPRAS CRÉDITO =================
+        function calcularVencimentoFatura(dataCompraStr, diaFechamento = 25, diaVencimento = 1, numParcela = 1) {
+            if (!dataCompraStr) return '';
+            const partes = dataCompraStr.split('T')[0].split('-');
+            if (partes.length !== 3) return dataCompraStr;
+
+            let ano = parseInt(partes[0], 10);
+            let mes = parseInt(partes[1], 10) - 1; // 0-indexed
+            const diaCompra = parseInt(partes[2], 10);
+
+            if (diaCompra <= diaFechamento) {
+                mes += 1;
+            } else {
+                mes += 2;
+            }
+
+            mes += (numParcela - 1);
+
+            const dataVenc = new Date(ano, mes, diaVencimento);
+            if (isNaN(dataVenc.getTime())) return '';
+
+            const anoVenc = dataVenc.getFullYear();
+            const mesVenc = String(dataVenc.getMonth() + 1).padStart(2, '0');
+            const diaVenc = String(dataVenc.getDate()).padStart(2, '0');
+
+            return `${anoVenc}-${mesVenc}-${diaVenc}`;
+        }
+
+        async function carregarGestaoCartoes() {
+            const { data, error } = await supabaseClient.from('fin_cartoes').select('*').order('nome_cartao');
+            const tb = document.getElementById('tbCartoesGestao');
+            if (!tb) return;
+
+            if (error || !data || data.length === 0) {
+                tb.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Nenhum cartão cadastrado.</td></tr>';
+                return;
+            }
+
+            tb.innerHTML = data.map(c => `
+                <tr>
+                    <td class="fw-bold">${c.nome_cartao}</td>
+                    <td>${moeda(c.limite)}</td>
+                    <td>Dia ${c.dia_fechamento || 25}</td>
+                    <td>Dia ${c.dia_vencimento || 1}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm me-1" onclick="editarCartao(${c.id}, '${c.nome_cartao.replace(/'/g, "\'")}', ${c.limite || 0}, ${c.dia_fechamento || 25}, ${c.dia_vencimento || 1})"><i class="bi bi-pencil"></i> Editar</button>
+                        <button class="btn btn-danger btn-sm" onclick="excluirCartao(${c.id})"><i class="bi bi-trash"></i> Excluir</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function editarCartao(id, nome, limite, fechamento, vencimento) {
+            document.getElementById('idCartaoEditando').value = id;
+            document.getElementById('novoNomeCartao').value = nome;
+            document.getElementById('novoLimiteCartao').value = limite;
+            document.getElementById('novoFechamentoCartao').value = fechamento;
+            document.getElementById('novoVencimentoCartao').value = vencimento;
+
+            const btnSalvar = document.getElementById('btnSalvarCartao');
+            const btnCancelar = document.getElementById('btnCancelarCartao');
+            if (btnSalvar) btnSalvar.innerHTML = '<i class="bi bi-check-circle"></i> Atualizar';
+            if (btnCancelar) btnCancelar.style.display = 'inline-block';
+        }
+
+        function cancelarEdicaoCartao() {
+            document.getElementById('idCartaoEditando').value = '';
+            document.getElementById('novoNomeCartao').value = '';
+            document.getElementById('novoLimiteCartao').value = '';
+            document.getElementById('novoFechamentoCartao').value = '';
+            document.getElementById('novoVencimentoCartao').value = '';
+
+            const btnSalvar = document.getElementById('btnSalvarCartao');
+            const btnCancelar = document.getElementById('btnCancelarCartao');
+            if (btnSalvar) btnSalvar.innerHTML = '<i class="bi bi-plus-circle"></i> Salvar';
+            if (btnCancelar) btnCancelar.style.display = 'none';
+        }
+
+        async function salvarCartao() {
+            const idEdit = document.getElementById('idCartaoEditando').value;
+            const nome = document.getElementById('novoNomeCartao').value.trim();
+            const limite = Number(document.getElementById('novoLimiteCartao').value) || 0;
+            const fechamento = Number(document.getElementById('novoFechamentoCartao').value) || 25;
+            const vencimento = Number(document.getElementById('novoVencimentoCartao').value) || 1;
+
+            if (!nome) return alert('Digite o nome do cartão.');
+
+            let usuarioId = null;
+            try {
+                const { data: authData } = await supabaseClient.auth.getUser();
+                if (authData && authData.user) {
+                    usuarioId = authData.user.id;
+                } else {
+                    const { data: cartaoExistente } = await supabaseClient.from('fin_cartoes').select('usuario_id').not('usuario_id', 'is', null).limit(1);
+                    if (cartaoExistente && cartaoExistente.length > 0) {
+                        usuarioId = cartaoExistente[0].usuario_id;
+                    }
+                }
+            } catch (e) {
+                console.log('Tentando buscar usuario_id...', e);
+            }
+
+            let payload = { nome_cartao: nome, limite: limite, dia_fechamento: fechamento, dia_vencimento: vencimento };
+
+            if (idEdit) {
+                let { error } = await supabaseClient.from('fin_cartoes').update(payload).eq('id', idEdit);
+                if (error && error.message.includes('column')) {
+                    const res = await supabaseClient.from('fin_cartoes').update({ nome_cartao: nome }).eq('id', idEdit);
+                    error = res.error;
+                }
+                if (error) return alert('Erro ao atualizar cartão: ' + error.message);
+                alert('Cartão atualizado com sucesso!');
+            } else {
+                if (usuarioId) payload.usuario_id = usuarioId;
+                let { error } = await supabaseClient.from('fin_cartoes').insert(payload);
+                if (error && error.message.includes('column')) {
+                    let altPayload = { nome_cartao: nome };
+                    if (usuarioId) altPayload.usuario_id = usuarioId;
+                    const res = await supabaseClient.from('fin_cartoes').insert(altPayload);
+                    error = res.error;
+                }
+                if (error) return alert('Erro ao salvar cartão: ' + error.message);
+                alert('Cartão cadastrado com sucesso!');
+            }
+
+            cancelarEdicaoCartao();
+            await carregarCartoes();
+            await carregarGestaoCartoes();
+            if (typeof carregarCompras === 'function') carregarCompras();
+        }
+
+        async function excluirCartao(id) {
+            if (!confirm('Deseja realmente excluir este cartão?')) return;
+            const { error } = await supabaseClient.from('fin_cartoes').delete().eq('id', id);
+            if (error) return alert('Erro ao excluir cartão: ' + error.message);
+            await carregarCartoes();
+            await carregarGestaoCartoes();
+        }
+
+        async function carregarGraficoCategorias() {
+            const { data } = await supabaseClient.from('vw_fin_dashboard_categorias').select('*');
+            if (!data) return;
+
+            const ctx = document.getElementById('graficoCategorias');
+            if (!ctx) return;
+
+            if (chartCategoriasInstance) chartCategoriasInstance.destroy();
+
+            chartCategoriasInstance = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: data.map(x => x.categoria),
+                    datasets: [{
+                        data: data.map(x => x.valor_total),
+                        backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#64748b']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
         async function carregarCartoes() {
             const { data } = await supabaseClient.from('fin_cartoes').select('*').order('nome_cartao');
             if (!data) return;
@@ -639,35 +1262,131 @@
         async function carregarFiltrosSelects() {
             const { data: cartoes } = await supabaseClient.from('fin_cartoes').select('*').order('nome_cartao');
             if (cartoes) {
-                filtroCartao.innerHTML = '<option value="">Todos os Cartões</option>' + 
-                    cartoes.map(c => `<option value="${c.id}">${c.nome_cartao}</option>`).join('');
+                const elFiltroCartao = document.getElementById('filtroCartao');
+                if (elFiltroCartao) {
+                    elFiltroCartao.innerHTML = '<option value="">Todos os Cartões</option>' + 
+                        cartoes.map(c => `<option value="${c.id}">${c.nome_cartao}</option>`).join('');
+                }
+                
+                cartoes.forEach(c => {
+                    mapaCartoesGlobal[c.id] = {
+                        dia_fechamento: c.dia_fechamento || 25,
+                        dia_vencimento: c.dia_vencimento || 1,
+                        nome: c.nome_cartao
+                    };
+                });
             }
 
             const { data: categorias } = await supabaseClient.from('fin_categorias').select('*').order('nome');
             if (categorias) {
-                filtroCategoria.innerHTML = '<option value="">Todas as Categorias</option>' + 
-                    categorias.map(cat => `<option value="${cat.id}">${cat.nome}</option>`).join('');
+                const elFiltroCat = document.getElementById('filtroCategoria');
+                if (elFiltroCat) {
+                    elFiltroCat.innerHTML = '<option value="">Todas as Categorias</option>' + 
+                        categorias.map(cat => `<option value="${cat.id}">${cat.nome}</option>`).join('');
+                }
+                categorias.forEach(cat => {
+                    mapaCategoriasGlobal[cat.id] = cat.nome;
+                });
             }
         }
 
         async function salvarCompra() {
+            const idEdit = document.getElementById('idCompraEditando') ? document.getElementById('idCompraEditando').value : '';
             const valor = Number(valorCompra.value);
             const parcelas = Number(quantidadeParcelas.value);
-            const { error } = await supabaseClient.from('fin_gastos_credito').insert({
-                cartao_id: Number(cartao.value),
-                categoria_id: categoria.value ? Number(categoria.value) : null,
-                descricao: descricao.value,
-                data_compra: dataCompra.value,
+            const cartaoId = Number(cartao.value);
+            const categoriaId = categoria.value ? Number(categoria.value) : null;
+            const desc = descricao.value.trim();
+            const dtCompra = dataCompra.value;
+            const isParcelado = parcelado.value === 'true';
+
+            if (!cartaoId || !desc || valor <= 0 || !dtCompra) {
+                return alert('Preencha os campos obrigatórios (Cartão, Descrição, Data e Valor).');
+            }
+
+            const payload = {
+                cartao_id: cartaoId,
+                categoria_id: categoriaId,
+                descricao: desc,
+                data_compra: dtCompra,
                 valor_compra: valor,
-                parcelado: parcelado.value === 'true',
+                parcelado: isParcelado,
                 quantidade_parcelas: parcelas,
-                valor_parcela: valor / parcelas
-            });
-            if (error) { alert('Erro ao salvar: ' + error.message); return; }
-            alert('Compra cadastrada com sucesso!');
+                valor_parcela: valor / (parcelas || 1)
+            };
+
+            if (idEdit) {
+                const { error } = await supabaseClient.from('fin_gastos_credito').update(payload).eq('id', idEdit);
+                if (error) { alert('Erro ao atualizar compra: ' + error.message); return; }
+                alert('Compra atualizada com sucesso!');
+            } else {
+                const { error } = await supabaseClient.from('fin_gastos_credito').insert(payload);
+                if (error) { alert('Erro ao cadastrar compra: ' + error.message); return; }
+                alert('Compra cadastrada com sucesso!');
+            }
+
+            cancelarEdicaoCompra();
             carregarCompras();
             carregarDashboard();
-            descricao.value = ''; valorCompra.value = ''; quantidadeParcelas.value = 1;
+            carregarGraficoCategorias();
+            
+            listaTodasParcelas = [];
+            if (document.getElementById('parcelasTela').style.display !== 'none') {
+                carregarParcelasTela();
+                carregarFaturas();
+            }
+        }
+
+        function editarCompra(id) {
+            const compra = listaTodasCompras.find(c => c.id == id);
+            if (!compra) return;
+
+            let inputId = document.getElementById('idCompraEditando');
+            if (!inputId) {
+                inputId = document.createElement('input');
+                inputId.type = 'hidden';
+                inputId.id = 'idCompraEditando';
+                document.getElementById('comprasCredito').appendChild(inputId);
+            }
+            inputId.value = compra.id;
+
+            if (document.getElementById('cartao')) document.getElementById('cartao').value = compra.cartao_id;
+            if (document.getElementById('categoria')) document.getElementById('categoria').value = compra.categoria_id || '';
+            if (document.getElementById('descricao')) document.getElementById('descricao').value = compra.descricao || '';
+            if (document.getElementById('dataCompra')) document.getElementById('dataCompra').value = compra.data_compra || '';
+            if (document.getElementById('valorCompra')) document.getElementById('valorCompra').value = compra.valor_compra || '';
+            if (document.getElementById('parcelado')) document.getElementById('parcelado').value = compra.parcelado ? 'true' : 'false';
+            if (document.getElementById('quantidadeParcelas')) document.getElementById('quantidadeParcelas').value = compra.quantidade_parcelas || 1;
+
+            const btnSalvar = document.querySelector("button[onclick='salvarCompra()']");
+            if (btnSalvar) btnSalvar.innerHTML = '<i class="bi bi-check-circle"></i> Atualizar Compra';
+
+            let btnCancelar = document.getElementById('btnCancelarCompra');
+            if (!btnCancelar && btnSalvar) {
+                btnCancelar = document.createElement('button');
+                btnCancelar.id = 'btnCancelarCompra';
+                btnCancelar.className = 'btn btn-secondary mt-3 ms-2';
+                btnCancelar.textContent = 'Cancelar';
+                btnCancelar.onclick = cancelarEdicaoCompra;
+                btnSalvar.parentNode.insertBefore(btnCancelar, btnSalvar.nextSibling);
+            } else if (btnCancelar) {
+                btnCancelar.style.display = 'inline-block';
+            }
+        }
+
+        function cancelarEdicaoCompra() {
+            const inputId = document.getElementById('idCompraEditando');
+            if (inputId) inputId.value = '';
+
+            if (document.getElementById('descricao')) document.getElementById('descricao').value = '';
+            if (document.getElementById('valorCompra')) document.getElementById('valorCompra').value = '';
+            if (document.getElementById('quantidadeParcelas')) document.getElementById('quantidadeParcelas').value = 1;
+
+            const btnSalvar = document.querySelector("button[onclick='salvarCompra()']");
+            if (btnSalvar) btnSalvar.innerHTML = 'Salvar Compra';
+
+            const btnCancelar = document.getElementById('btnCancelarCompra');
+            if (btnCancelar) btnCancelar.style.display = 'none';
         }
 
         async function carregarCompras() {
@@ -685,14 +1404,34 @@
         }
 
         function aplicarFiltrosCompras() {
-            const cartaoId = filtroCartao.value;
-            const categoriaId = filtroCategoria.value;
-            const mesAnoVal = filtroMesAno.value;
+            const filtroCartaoEl = document.getElementById('filtroCartao');
+            const filtroCategoriaEl = document.getElementById('filtroCategoria');
+            const filtroMesAnoEl = document.getElementById('filtroMesAno');
 
-            let resultado = listaTodasCompras;
+            const cartaoId = filtroCartaoEl ? filtroCartaoEl.value : '';
+            const mesVencVal = document.getElementById('filtroMesVencimento') ? document.getElementById('filtroMesVencimento').value : '';
+            const categoriaId = filtroCategoriaEl ? filtroCategoriaEl.value : '';
+            const mesAnoVal = filtroMesAnoEl ? filtroMesAnoEl.value : '';
+
+            let resultado = listaTodasCompras.map(item => {
+                const cId = item.cartao_id || item.id_cartao;
+                const dtCompra = item.data_compra || item.dt_compra;
+                const configCartao = mapaCartoesGlobal[cId] || { dia_fechamento: 25, dia_vencimento: 1 };
+                const dataVenc = calcularVencimentoFatura(dtCompra, configCartao.dia_fechamento, configCartao.dia_vencimento);
+                return { ...item, data_vencimento_fatura: dataVenc };
+            });
 
             if (cartaoId) {
-                resultado = resultado.filter(item => item.cartao_id == cartaoId);
+                resultado = resultado.filter(item => (item.cartao_id || item.id_cartao) == cartaoId);
+            }
+
+            if (mesVencVal) {
+                const [ano, mes] = mesVencVal.split('-');
+                resultado = resultado.filter(item => {
+                    if (!item.data_vencimento_fatura) return false;
+                    const partes = item.data_vencimento_fatura.split('-');
+                    return partes[0] === ano && partes[1] === mes;
+                });
             }
 
             if (categoriaId) {
@@ -702,48 +1441,91 @@
             if (mesAnoVal) {
                 const [ano, mes] = mesAnoVal.split('-');
                 resultado = resultado.filter(item => {
-                    if (!item.data_compra) return false;
-                    const dataComp = item.data_compra.split('-');
+                    const dtComp = item.data_compra || item.dt_compra;
+                    if (!dtComp) return false;
+                    const dataComp = dtComp.split('T')[0].split('-');
                     return dataComp[0] === ano && dataComp[1] === mes;
                 });
             }
 
-            renderizarTabelaCompras(resultado);
+            renderizarTabelaCompras(resultado, cartaoId, mesVencVal);
         }
 
-        function renderizarTabelaCompras(dados) {
+        function renderizarTabelaCompras(dados, cartaoIdFiltro, mesVencFiltro) {
             const tb = document.getElementById('tbCompras');
-            const contador = document.getElementById('contadorComprasFiltro');
+            
+            const totalGeral = listaTodasCompras.reduce((acc, c) => acc + Number(c.valor_compra || 0), 0);
 
-            if (contador) {
-                contador.textContent = `Exibindo ${dados.length} de ${listaTodasCompras.length} registros`;
+            let totalCartao = 0;
+            if (cartaoIdFiltro) {
+                totalCartao = listaTodasCompras
+                    .filter(c => (c.cartao_id || c.id_cartao) == cartaoIdFiltro)
+                    .reduce((acc, c) => acc + Number(c.valor_compra || 0), 0);
+            } else {
+                totalCartao = dados.reduce((acc, c) => acc + Number(c.valor_compra || 0), 0);
             }
 
+            let totalFatura = dados.reduce((acc, c) => acc + Number(c.valor_compra || 0), 0);
+
+            document.getElementById('totalGeralCompras').textContent = moeda(totalGeral);
+            
+            const labelCartao = document.getElementById('labelTotalCartao');
+            const elTotalCartao = document.getElementById('totalCartaoSelecionado');
+            if (cartaoIdFiltro && mapaCartoesGlobal[cartaoIdFiltro]) {
+                labelCartao.textContent = `Total Cartão (${mapaCartoesGlobal[cartaoIdFiltro].nome})`;
+            } else {
+                labelCartao.textContent = 'Total Cartão (Todos)';
+            }
+            elTotalCartao.textContent = moeda(totalCartao);
+
+            const labelFatura = document.getElementById('labelTotalFatura');
+            const elTotalFatura = document.getElementById('totalFaturaSelecionada');
+            if (mesVencFiltro) {
+                const [a, m] = mesVencFiltro.split('-');
+                labelFatura.textContent = `Total Fatura (${m}/${a})`;
+            } else {
+                labelFatura.textContent = 'Total Fatura (Filtrada)';
+            }
+            elTotalFatura.textContent = moeda(totalFatura);
+
+            if (!tb) return;
+
             if (!dados || dados.length === 0) {
-                tb.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Nenhuma compra encontrada com os filtros selecionados.</td></tr>';
+                tb.innerHTML = '<tr><td colspan="9" class="text-center text-muted">Nenhuma compra encontrada com os filtros selecionados.</td></tr>';
                 return;
             }
 
             tb.innerHTML = dados.map(item => `
                 <tr>
-                    <td>${formatarData(item.data_compra)}</td>
-                    <td><small class="text-muted">${formatarDataHora(item.data_cadastro)}</small></td>
+                    <td><input type="checkbox" class="form-check-input check-compra-item" value="${item.id}" onchange="atualizarBotaoExclusaoMassaCompras()"></td>
+                    <td>${formatarData(item.data_compra || item.dt_compra)}</td>
+                    <td><span class="badge bg-primary"><i class="bi bi-calendar-event"></i> ${formatarData(item.data_vencimento_fatura)}</span></td>
                     <td>${item.descricao}</td>
                     <td><span class="badge bg-secondary">${item.nome_cartao || '-'}</span></td>
                     <td>${item.categoria || '-'}</td>
                     <td class="fw-bold">${moeda(item.valor_compra)}</td>
                     <td>${item.quantidade_parcelas}x</td>
                     <td>
-                        <button class="btn btn-danger btn-sm" onclick="excluirCompra(${item.id})">Excluir</button>
+                        <button class="btn btn-warning btn-sm me-1" onclick="editarCompra(${item.id})"><i class="bi bi-pencil"></i> Editar</button>
+                        <button class="btn btn-danger btn-sm" onclick="excluirCompra(${item.id})"><i class="bi bi-trash"></i> Excluir</button>
                     </td>
                 </tr>
             `).join('');
+            
+            const checkAll = document.getElementById('checkTodasCompras');
+            if (checkAll) checkAll.checked = false;
+            atualizarBotaoExclusaoMassaCompras();
         }
 
         function limparFiltrosCompras() {
-            filtroCartao.value = '';
-            filtroCategoria.value = '';
-            filtroMesAno.value = '';
+            const filtroCartaoEl = document.getElementById('filtroCartao');
+            const filtroCategoriaEl = document.getElementById('filtroCategoria');
+            const filtroMesAnoEl = document.getElementById('filtroMesAno');
+
+            if (filtroCartaoEl) filtroCartaoEl.value = '';
+            if (document.getElementById('filtroMesVencimento')) document.getElementById('filtroMesVencimento').value = '';
+            if (filtroCategoriaEl) filtroCategoriaEl.value = '';
+            if (filtroMesAnoEl) filtroMesAnoEl.value = '';
             aplicarFiltrosCompras();
         }
 
@@ -753,61 +1535,301 @@
             if (error) { alert(error.message); return; }
             carregarCompras();
             carregarDashboard();
+            carregarGraficoCategorias();
+            listaTodasParcelas = [];
         }
 
-        // PARCELAS E FATURAS (STATUS TOGGLE COM BOTAO DESFAZER/PAGAR)
+        function selecionarTodasCompras(elCheckAll) {
+            const checkboxes = document.querySelectorAll('.check-compra-item');
+            checkboxes.forEach(cb => cb.checked = elCheckAll.checked);
+            atualizarBotaoExclusaoMassaCompras();
+        }
+
+        function atualizarBotaoExclusaoMassaCompras() {
+            const selecionados = document.querySelectorAll('.check-compra-item:checked');
+            const btn = document.getElementById('btnExcluirSelecionadosCompras');
+            const qtd = document.getElementById('qtdComprasSelecionadas');
+            if (btn && qtd) {
+                if (selecionados.length > 0) {
+                    btn.style.display = 'inline-block';
+                    qtd.textContent = selecionados.length;
+                } else {
+                    btn.style.display = 'none';
+                    qtd.textContent = '0';
+                }
+            }
+        }
+
+        async function excluirComprasEmMassa() {
+            const selecionados = Array.from(document.querySelectorAll('.check-compra-item:checked')).map(cb => Number(cb.value));
+            if (selecionados.length === 0) return;
+
+            if (!confirm(`Deseja realmente excluir as ${selecionados.length} compras selecionadas?`)) return;
+
+            const { error } = await supabaseClient.from('fin_gastos_credito').delete().in('id', selecionados);
+            if (error) return alert('Erro ao excluir compras: ' + error.message);
+
+            alert(`${selecionados.length} compras excluídas com sucesso!`);
+            carregarCompras();
+            carregarDashboard();
+            carregarGraficoCategorias();
+            listaTodasParcelas = [];
+        }
+
+        // ================= PARCELAS E FATURAS =================
+        let listaTodasParcelas = [];
+
         async function carregarParcelasTela() {
-            const { data } = await supabaseClient.from('vw_fin_parcelas_detalhadas').select('*');
-            if (!data) return;
-            tbParcelasTela.innerHTML = data.map(item => `
+            await carregarFiltrosSelects();
+
+            let { data: compras, error } = await supabaseClient.from('fin_gastos_credito').select('*');
+
+            if (error || !compras || compras.length === 0) {
+                const resView = await supabaseClient.from('vw_fin_compras_credito').select('*');
+                compras = resView.data || [];
+            }
+
+            let parcelasGeradas = [];
+
+            compras.forEach(compra => {
+                const cartaoId = compra.cartao_id || compra.id_cartao;
+                const configCartao = mapaCartoesGlobal[cartaoId] || { dia_fechamento: 25, dia_vencimento: 1 };
+                const dtCompra = compra.data_compra || compra.dt_compra;
+                const totalParc = Number(compra.quantidade_parcelas || 1);
+                const valorUnicoParcela = Number(compra.valor_compra || 0) / (totalParc || 1);
+                const nomeCategoria = compra.categoria || mapaCategoriasGlobal[compra.categoria_id] || 'Outros';
+
+                for (let i = 1; i <= totalParc; i++) {
+                    const dtVenc = calcularVencimentoFatura(dtCompra, configCartao.dia_fechamento, configCartao.dia_vencimento, i);
+                    
+                    parcelasGeradas.push({
+                        id: `${compra.id}_${i}`,
+                        gasto_id: compra.id,
+                        descricao: compra.descricao,
+                        numero_parcela: i,
+                        total_parcelas: totalParc,
+                        quantidade_parcelas: totalParc,
+                        valor_parcela: valorUnicoParcela,
+                        data_vencimento: dtVenc,
+                        data_compra: dtCompra,
+                        cartao_id: cartaoId,
+                        categoria: nomeCategoria,
+                        paga: false
+                    });
+                }
+            });
+
+            listaTodasParcelas = parcelasGeradas;
+            listaTodasParcelas.sort((a, b) => (a.data_vencimento > b.data_vencimento ? 1 : -1));
+
+            aplicarFiltrosParcelas();
+        }
+
+        function aplicarFiltrosParcelas() {
+            const tipo = document.getElementById('filtroTipoParcela') ? document.getElementById('filtroTipoParcela').value : '';
+            const status = document.getElementById('filtroStatusParcela') ? document.getElementById('filtroStatusParcela').value : 'abertas';
+            const mesVenc = document.getElementById('filtroMesVencimentoParcelas') ? document.getElementById('filtroMesVencimentoParcelas').value : '';
+
+            let resultado = listaTodasParcelas;
+
+            if (tipo === 'parceladas') {
+                resultado = resultado.filter(p => Number(p.total_parcelas || p.quantidade_parcelas) > 1);
+            } else if (tipo === 'avista') {
+                resultado = resultado.filter(p => Number(p.total_parcelas || p.quantidade_parcelas) === 1);
+            }
+
+            if (status === 'abertas') {
+                resultado = resultado.filter(p => !p.paga);
+            } else if (status === 'pagas') {
+                resultado = resultado.filter(p => p.paga);
+            }
+
+            if (mesVenc) {
+                const [ano, mes] = mesVenc.split('-');
+                resultado = resultado.filter(p => {
+                    if (!p.data_vencimento) return false;
+                    const partes = p.data_vencimento.split('-');
+                    return partes[0] === ano && partes[1] === mes;
+                });
+            }
+
+            renderizarTabelaParcelas(resultado);
+            carregarGraficoCategoriasParcelas(resultado);
+        }
+
+        function carregarGraficoCategoriasParcelas(dadosParcelas) {
+            const ctx = document.getElementById('graficoCategoriasParcelas');
+            if (!ctx) return;
+
+            const categoriasTotais = {};
+            dadosParcelas.forEach(p => {
+                const cat = p.categoria || 'Outros';
+                categoriasTotais[cat] = (categoriasTotais[cat] || 0) + Number(p.valor_parcela || 0);
+            });
+
+            const labels = Object.keys(categoriasTotais);
+            const valores = Object.values(categoriasTotais);
+
+            if (chartCategoriasParcelasInstance) chartCategoriasParcelasInstance.destroy();
+
+            if (labels.length === 0) return;
+
+            chartCategoriasParcelasInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: valores,
+                        backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#64748b', '#06b6d4']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderizarTabelaParcelas(dados) {
+            const tb = document.getElementById('tbParcelasTela');
+            const totalValEl = document.getElementById('totalValorParcelas');
+            const totalQtdEl = document.getElementById('qtdParcelasFiltradas');
+
+            const totalSum = dados.reduce((acc, item) => acc + Number(item.valor_parcela || 0), 0);
+            if (totalValEl) totalValEl.textContent = moeda(totalSum);
+            if (totalQtdEl) totalQtdEl.textContent = dados.length;
+
+            if (!tb) return;
+
+            if (!dados || dados.length === 0) {
+                tb.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Nenhuma parcela encontrada para os filtros selecionados.</td></tr>';
+                return;
+            }
+
+            tb.innerHTML = dados.map(item => `
                 <tr>
-                    <td>${item.descricao}</td>
-                    <td>${item.numero_parcela}/${item.total_parcelas}</td>
-                    <td>${formatarData(item.data_vencimento)}</td>
-                    <td>${moeda(item.valor_parcela)}</td>
+                    <td><input type="checkbox" class="form-check-input check-parcela-item" value="${item.gasto_id || item.id}" onchange="atualizarBotaoExclusaoMassaParcelas()"></td>
+                    <td class="fw-bold">${item.descricao}</td>
+                    <td><span class="badge ${(item.total_parcelas || item.quantidade_parcelas) > 1 ? 'bg-primary' : 'bg-secondary'}">${item.numero_parcela}/${item.total_parcelas || item.quantidade_parcelas || 1}</span></td>
+                    <td><span class="badge bg-info text-dark">${formatarData(item.data_vencimento)}</span></td>
+                    <td class="fw-bold">${moeda(item.valor_parcela)}</td>
                     <td>
                         ${item.paga ? '<span class="badge bg-success">Paga</span>' : '<span class="badge bg-danger">Aberta</span>'}
                     </td>
                     <td>
-                        <button class="btn btn-${item.paga ? 'warning' : 'success'} btn-sm" onclick="pagarParcela(${item.id})">
+                        <button class="btn btn-${item.paga ? 'warning' : 'success'} btn-sm" onclick="pagarParcela('${item.id}')">
                             ${item.paga ? 'Desfazer' : 'Pagar'}
                         </button>
                     </td>
                 </tr>
             `).join('');
+
+            const checkAll = document.getElementById('checkTodasParcelas');
+            if (checkAll) checkAll.checked = false;
+            atualizarBotaoExclusaoMassaParcelas();
+        }
+
+        function limparFiltrosParcelas() {
+            if (document.getElementById('filtroTipoParcela')) document.getElementById('filtroTipoParcela').value = '';
+            if (document.getElementById('filtroStatusParcela')) document.getElementById('filtroStatusParcela').value = '';
+            if (document.getElementById('filtroMesVencimentoParcelas')) document.getElementById('filtroMesVencimentoParcelas').value = '';
+            aplicarFiltrosParcelas();
         }
 
         async function pagarParcela(id) {
-            const { data: parcelaAtual, error: erroBusca } = await supabaseClient
-                .from('fin_parcelas_credito')
-                .select('paga')
-                .eq('id', id)
-                .single();
+            const item = listaTodasParcelas.find(p => p.id == id);
+            if (!item) return;
 
-            if (erroBusca) return alert('Erro ao verificar status da parcela.');
+            item.paga = !item.paga;
 
-            const novoStatus = !parcelaAtual.paga;
-
-            const { error } = await supabaseClient.from('fin_parcelas_credito').update({
-                paga: novoStatus,
-                data_pagamento: novoStatus ? new Date().toISOString().split('T')[0] : null
-            }).eq('id', id);
-
-            if (error) { alert(error.message); return; }
-
-            carregarParcelasTela();
+            aplicarFiltrosParcelas();
+            carregarFaturas();
             carregarDashboard();
         }
 
         async function carregarFaturas() {
-            const { data } = await supabaseClient.from('vw_fin_faturas_detalhadas').select('*');
+            await carregarFiltrosSelects();
+            const { data } = await supabaseClient.from('vw_fin_compras_credito').select('*');
             if (!data) return;
-            tbFaturas.innerHTML = data.map(item => `
-                <tr><td>${item.competencia_mes}/${item.competencia_ano}</td><td>${item.parcelas}</td><td>${moeda(item.valor_total)}</td></tr>
-            `).join('');
+
+            const faturasAgrupadas = {};
+
+            data.forEach(item => {
+                const cId = item.cartao_id || item.id_cartao;
+                const dtCompra = item.data_compra || item.dt_compra;
+                const totalParc = Number(item.quantidade_parcelas || 1);
+                const valorUnicoParcela = Number(item.valor_compra || 0) / totalParc;
+                const configCartao = mapaCartoesGlobal[cId] || { dia_fechamento: 25, dia_vencimento: 1 };
+
+                for (let i = 1; i <= totalParc; i++) {
+                    const dtVenc = calcularVencimentoFatura(dtCompra, configCartao.dia_fechamento, configCartao.dia_vencimento, i);
+                    if (dtVenc) {
+                        const [ano, mes] = dtVenc.split('-');
+                        const chave = `${mes}/${ano}`;
+                        if (!faturasAgrupadas[chave]) {
+                            faturasAgrupadas[chave] = { mes, ano, parcelas: 0, valor_total: 0 };
+                        }
+                        faturasAgrupadas[chave].parcelas += 1;
+                        faturasAgrupadas[chave].valor_total += valorUnicoParcela;
+                    }
+                }
+            });
+
+            const listaFaturas = Object.values(faturasAgrupadas).sort((a, b) => `${a.ano}-${a.mes}` > `${b.ano}-${b.mes}` ? 1 : -1);
+
+            const tb = document.getElementById('tbFaturas');
+            if (tb) {
+                if (listaFaturas.length === 0) {
+                    tb.innerHTML = '<tr><td colspan="3" class="text-center text-muted">Nenhuma fatura encontrada.</td></tr>';
+                } else {
+                    tb.innerHTML = listaFaturas.map(item => `
+                        <tr><td>${item.mes}/${item.ano}</td><td>${item.parcelas}</td><td>${moeda(item.valor_total)}</td></tr>
+                    `).join('');
+                }
+            }
         }
 
-        // DÉBITO / PIX
+        function selecionarTodasParcelas(elCheckAll) {
+            const checkboxes = document.querySelectorAll('.check-parcela-item');
+            checkboxes.forEach(cb => cb.checked = elCheckAll.checked);
+            atualizarBotaoExclusaoMassaParcelas();
+        }
+
+        function atualizarBotaoExclusaoMassaParcelas() {
+            const selecionados = document.querySelectorAll('.check-parcela-item:checked');
+            const btn = document.getElementById('btnExcluirSelecionadosParcelas');
+            const qtd = document.getElementById('qtdParcelasSelecionadas');
+            if (btn && qtd) {
+                if (selecionados.length > 0) {
+                    btn.style.display = 'inline-block';
+                    qtd.textContent = selecionados.length;
+                } else {
+                    btn.style.display = 'none';
+                    qtd.textContent = '0';
+                }
+            }
+        }
+
+        async function excluirParcelasEmMassa() {
+            const selecionados = Array.from(document.querySelectorAll('.check-parcela-item:checked')).map(cb => Number(cb.value));
+            if (selecionados.length === 0) return;
+
+            if (!confirm(`Deseja realmente excluir as compras selecionadas?`)) return;
+
+            const { error } = await supabaseClient.from('fin_gastos_credito').delete().in('id', selecionados);
+            if (error) return alert('Erro ao excluir parcelas: ' + error.message);
+
+            alert(`Compras/Parcelas excluídas com sucesso!`);
+            carregarParcelasTela();
+            carregarDashboard();
+        }
+
+        // ================= DÉBITO / PIX =================
         async function salvarDebito() {
             const desc = document.getElementById('descDebito').value.trim();
             const val = Number(document.getElementById('valorDebito').value);
@@ -843,12 +1865,17 @@
 
             tb.innerHTML = data.map(item => `
                 <tr>
+                    <td><input type="checkbox" class="form-check-input check-debito-item" value="${item.id}" onchange="atualizarBotaoExclusaoMassaDebitos()"></td>
                     <td>${formatarData(item.data_movimentacao)}</td>
                     <td>${item.descricao}</td>
                     <td>${moeda(item.valor)}</td>
                     <td><button class="btn btn-danger btn-sm" onclick="excluirDebito(${item.id})">Excluir</button></td>
                 </tr>
             `).join('');
+            
+            const checkAll = document.getElementById('checkTodosDebitos');
+            if (checkAll) checkAll.checked = false;
+            atualizarBotaoExclusaoMassaDebitos();
         }
 
         async function excluirDebito(id) {
@@ -859,7 +1886,42 @@
             await carregarDashboard();
         }
 
-        // OUTROS GASTOS
+        function selecionarTodosDebitos(elCheckAll) {
+            const checkboxes = document.querySelectorAll('.check-debito-item');
+            checkboxes.forEach(cb => cb.checked = elCheckAll.checked);
+            atualizarBotaoExclusaoMassaDebitos();
+        }
+
+        function atualizarBotaoExclusaoMassaDebitos() {
+            const selecionados = document.querySelectorAll('.check-debito-item:checked');
+            const btn = document.getElementById('btnExcluirSelecionadosDebitos');
+            const qtd = document.getElementById('qtdDebitosSelecionados');
+            if (btn && qtd) {
+                if (selecionados.length > 0) {
+                    btn.style.display = 'inline-block';
+                    qtd.textContent = selecionados.length;
+                } else {
+                    btn.style.display = 'none';
+                    qtd.textContent = '0';
+                }
+            }
+        }
+
+        async function excluirDebitosEmMassa() {
+            const selecionados = Array.from(document.querySelectorAll('.check-debito-item:checked')).map(cb => Number(cb.value));
+            if (selecionados.length === 0) return;
+
+            if (!confirm(`Deseja realmente excluir os ${selecionados.length} lançamentos de débito selecionados?`)) return;
+
+            const { error } = await supabaseClient.from('fin_movimentacoes_debito').delete().in('id', selecionados);
+            if (error) return alert('Erro ao excluir lançamentos: ' + error.message);
+
+            alert(`${selecionados.length} lançamentos excluídos com sucesso!`);
+            carregarDebitos();
+            carregarDashboard();
+        }
+
+        // ================= OUTROS GASTOS =================
         async function salvarOutrosGastos() {
             const desc = document.getElementById('descOutros').value.trim();
             const val = Number(document.getElementById('valorOutros').value);
@@ -905,45 +1967,184 @@
             await carregarDashboard();
         }
 
-        // ORÇAMENTOS
+        // ================= ORÇAMENTOS =================
+        async function carregarCategoriasParaOrcamento() {
+            const { data } = await supabaseClient.from('fin_categorias').select('*').order('nome');
+            const select = document.getElementById('categoriaOrcamento');
+            if (select && data) {
+                select.innerHTML = data.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+            }
+        }
+
+        async function salvarOrcamento() {
+            const idEdit = document.getElementById('idOrcamentoEditando').value;
+            const categoriaId = Number(document.getElementById('categoriaOrcamento').value);
+            const valorPlanejado = Number(document.getElementById('valorPlanejadoOrcamento').value);
+
+            if (!categoriaId || valorPlanejado <= 0) return alert('Selecione a categoria e digite um valor válido.');
+
+            if (idEdit) {
+                const { error } = await supabaseClient.from('fin_orcamentos').update({
+                    categoria_id: categoriaId,
+                    valor_planejado: valorPlanejado
+                }).eq('id', idEdit);
+
+                if (error) return alert('Erro ao atualizar orçamento: ' + error.message);
+                alert('Orçamento atualizado!');
+            } else {
+                const { error } = await supabaseClient.from('fin_orcamentos').insert({
+                    categoria_id: categoriaId,
+                    valor_planejado: valorPlanejado
+                });
+
+                if (error) return alert('Erro ao salvar orçamento: ' + error.message);
+                alert('Orçamento cadastrado com sucesso!');
+            }
+
+            cancelarEdicaoOrcamento();
+            await carregarOrcamentosTela();
+        }
+
+        function editarOrcamento(id, categoriaId, valorPlanejado) {
+            document.getElementById('idOrcamentoEditando').value = id;
+            document.getElementById('categoriaOrcamento').value = categoriaId;
+            document.getElementById('valorPlanejadoOrcamento').value = valorPlanejado;
+
+            document.getElementById('tituloFormOrcamento').innerHTML = '✏️ Editar Orçamento';
+            document.getElementById('btnSalvarOrcamento').textContent = 'Atualizar Orçamento';
+            document.getElementById('btnCancelarOrcamento').style.display = 'inline-block';
+        }
+
+        function cancelarEdicaoOrcamento() {
+            document.getElementById('idOrcamentoEditando').value = '';
+            document.getElementById('valorPlanejadoOrcamento').value = '';
+            document.getElementById('tituloFormOrcamento').innerHTML = '🎯 Cadastrar / Editar Orçamento';
+            document.getElementById('btnSalvarOrcamento').textContent = 'Salvar Orçamento';
+            document.getElementById('btnCancelarOrcamento').style.display = 'none';
+        }
+
+        async function excluirOrcamento(id) {
+            if (!confirm('Deseja excluir este orçamento?')) return;
+            const { error } = await supabaseClient.from('fin_orcamentos').delete().eq('id', id);
+            if (error) return alert('Erro ao excluir: ' + error.message);
+            await carregarOrcamentosTela();
+        }
+
         async function carregarOrcamentosTela() {
-            const { data } = await supabaseClient.from('vw_fin_orcamento_vs_realizado').select('*');
-            if (!data) return;
-            tbOrcamentosTela.innerHTML = data.map(item => `
-                <tr><td>${item.categoria}</td><td>${moeda(item.valor_planejado)}</td><td>${moeda(item.valor_realizado)}</td>
-                <td><span class="badge bg-${item.percentual_utilizado >= 100 ? 'danger' : item.percentual_utilizado >= 80 ? 'warning' : 'success'}">${item.percentual_utilizado}%</span></td></tr>
+            const { data, error } = await supabaseClient.from('vw_fin_orcamento_vs_realizado').select('*');
+            const tb = document.getElementById('tbOrcamentosTela');
+            if (!tb) return;
+
+            if (error || !data || data.length === 0) {
+                tb.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Nenhum orçamento cadastrado.</td></tr>';
+                return;
+            }
+
+            tb.innerHTML = data.map(item => `
+                <tr>
+                    <td class="fw-bold">${item.categoria}</td>
+                    <td>${moeda(item.valor_planejado)}</td>
+                    <td>${moeda(item.valor_realizado)}</td>
+                    <td>
+                        <span class="badge bg-${item.percentual_utilizado >= 100 ? 'danger' : item.percentual_utilizado >= 80 ? 'warning' : 'success'}">
+                            ${item.percentual_utilizado}%
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-warning btn-sm me-1" onclick="editarOrcamento(${item.id || item.orcamento_id}, ${item.categoria_id}, ${item.valor_planejado})"><i class="bi bi-pencil"></i> Editar</button>
+                        <button class="btn btn-danger btn-sm" onclick="excluirOrcamento(${item.id || item.orcamento_id})"><i class="bi bi-trash"></i> Excluir</button>
+                    </td>
+                </tr>
             `).join('');
         }
 
-        // INVESTIMENTOS
-        async function salvarInvestimento() {
-            const ticker = document.getElementById('tickerInvestimento').value.trim().toUpperCase();
+        // ================= INVESTIMENTOS =================
+        function alternarCamposInvestimento() {
             const tipo = document.getElementById('tipoInvestimento').value;
-            const qtd = Number(document.getElementById('qtdInvestimento').value);
-            const valorAplicado = Number(document.getElementById('valorInvestimento').value);
-            const valorAtualUn = Number(document.getElementById('valorAtualUnitario').value) || (valorAplicado / (qtd || 1));
+            const painelVariavel = document.getElementById('painelVariavel');
+            const painelRendaFixa = document.getElementById('painelRendaFixa');
 
-            if (!ticker || qtd <= 0 || valorAplicado <= 0) return alert('Preencha os campos obrigatórios corretamente.');
+            if (tipo === 'Ação' || tipo === 'FII') {
+                painelVariavel.style.display = 'flex';
+                painelRendaFixa.style.display = 'none';
+            } else {
+                painelVariavel.style.display = 'none';
+                painelRendaFixa.style.display = 'flex';
+            }
+        }
 
-            const saldoInicial = qtd * valorAtualUn;
+        async function salvarInvestimento() {
+            const tipo = document.getElementById('tipoInvestimento').value;
 
-            const { error } = await supabaseClient.from('investimentos').insert({
-                nome: ticker,
-                tipo: tipo,
-                quantidade: qtd,
-                valor_aplicado: valorAplicado,
-                valor_atual_unitario: valorAtualUn,
-                saldo_atual: saldoInicial,
-                data_aplicacao: new Date().toISOString().split('T')[0]
-            });
+            if (tipo === 'Ação' || tipo === 'FII') {
+                const ticker = document.getElementById('tickerInvestimento').value.trim().toUpperCase();
+                const qtd = Number(document.getElementById('qtdInvestimento').value);
+                const valorAplicado = Number(document.getElementById('valorInvestimento').value);
+                const valorAtualUn = Number(document.getElementById('valorAtualUnitario').value) || (valorAplicado / (qtd || 1));
 
-            if (error) return alert('Erro ao salvar investimento: ' + error.message);
+                if (!ticker || qtd <= 0 || valorAplicado <= 0) return alert('Preencha os campos obrigatórios de Ação/FII.');
+
+                const saldoInicial = qtd * valorAtualUn;
+
+                const { error } = await supabaseClient.from('investimentos').insert({
+                    nome: ticker,
+                    tipo: tipo,
+                    quantidade: qtd,
+                    valor_aplicado: valorAplicado,
+                    valor_atual_unitario: valorAtualUn,
+                    saldo_atual: saldoInicial,
+                    data_aplicacao: new Date().toISOString().split('T')[0]
+                });
+
+                if (error) return alert('Erro ao salvar investimento: ' + error.message);
+
+                document.getElementById('tickerInvestimento').value = '';
+                document.getElementById('qtdInvestimento').value = '1';
+                document.getElementById('valorInvestimento').value = '';
+                document.getElementById('valorAtualUnitario').value = '';
+
+            } else {
+                const nome = document.getElementById('nomeRendaFixa').value.trim();
+                const valorAplicado = Number(document.getElementById('valorRendaFixa').value);
+                const indexador = document.getElementById('indexadorRendaFixa').value;
+                const taxa = Number(document.getElementById('taxaRendaFixa').value) || 0;
+                const dataAplic = document.getElementById('dataAplicacaoRendaFixa').value;
+
+                if (!nome || valorAplicado <= 0) return alert('Preencha o nome e o valor aplicado.');
+
+                let taxaAnualFinal = 0.10;
+                if (indexador === 'CDI') {
+                    taxaAnualFinal = (taxa / 100) * 0.1075;
+                } else if (indexador === 'FIXA') {
+                    taxaAnualFinal = taxa / 100;
+                } else if (indexador === 'IPCA') {
+                    taxaAnualFinal = 0.045 + (taxa / 100);
+                }
+
+                const diasDecorridos = Math.max(1, (new Date() - new Date(dataAplic)) / (1000 * 60 * 60 * 24));
+                const anos = diasDecorridos / 365;
+                const saldoAtualEstimado = valorAplicado * Math.pow(1 + taxaAnualFinal, anos);
+
+                const nomeFormatado = `${nome} (${taxa}% ${indexador})`;
+
+                const { error } = await supabaseClient.from('investimentos').insert({
+                    nome: nomeFormatado,
+                    tipo: tipo,
+                    quantidade: 1,
+                    valor_aplicado: valorAplicado,
+                    valor_atual_unitario: saldoAtualEstimado,
+                    saldo_atual: saldoAtualEstimado,
+                    data_aplicacao: dataAplic
+                });
+
+                if (error) return alert('Erro ao salvar renda fixa: ' + error.message);
+
+                document.getElementById('nomeRendaFixa').value = '';
+                document.getElementById('valorRendaFixa').value = '';
+                document.getElementById('taxaRendaFixa').value = '';
+            }
 
             alert('Investimento cadastrado com sucesso!');
-            document.getElementById('tickerInvestimento').value = '';
-            document.getElementById('qtdInvestimento').value = '1';
-            document.getElementById('valorInvestimento').value = '';
-            document.getElementById('valorAtualUnitario').value = '';
             await carregarInvestimentos();
         }
 
@@ -953,50 +2154,97 @@
             const tb = document.getElementById('tbInvestimentos');
             if (!tb) return;
 
+            let totalAplicado = 0;
+            let saldoTotalGeral = 0;
+
             if (data.length === 0) {
-                tb.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Neste momento não existem investimentos cadastrados.</td></tr>';
-                return;
+                tb.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Nenhum investimento cadastrado.</td></tr>';
+            } else {
+                tb.innerHTML = data.map(item => {
+                    const isRendaFixa = item.tipo !== 'Ação' && item.tipo !== 'FII';
+                    const precoUnAtual = item.valor_atual_unitario || (item.quantidade ? item.saldo_atual / item.quantidade : 0);
+                    const saldoTotal = isRendaFixa ? item.saldo_atual : (item.quantidade * precoUnAtual);
+                    const diferenca = saldoTotal - item.valor_aplicado;
+                    const percentual = item.valor_aplicado > 0 ? (diferenca / item.valor_aplicado) * 100 : 0;
+                    
+                    totalAplicado += Number(item.valor_aplicado || 0);
+                    saldoTotalGeral += Number(saldoTotal || 0);
+
+                    const corLucro = diferenca >= 0 ? 'text-success' : 'text-danger';
+                    const sinal = diferenca >= 0 ? '+' : '';
+
+                    return `
+                        <tr>
+                            <td class="fw-bold">${item.nome}</td>
+                            <td><span class="badge bg-${isRendaFixa ? 'info text-dark' : 'secondary'}">${item.tipo}</span></td>
+                            <td>${isRendaFixa ? 'Renda Fixa' : item.quantidade}</td>
+                            <td>${moeda(item.valor_aplicado)}</td>
+                            <td>${moeda(precoUnAtual)}</td>
+                            <td class="fw-bold">${moeda(saldoTotal)}</td>
+                            <td class="${corLucro} fw-bold">
+                                ${sinal}${moeda(diferenca)} (${sinal}${percentual.toFixed(2)}%)
+                            </td>
+                            <td><button class="btn btn-danger btn-sm" onclick="excluirInvestimento(${item.id})"><i class="bi bi-trash"></i> Excluir</button></td>
+                        </tr>
+                    `;
+                }).join('');
             }
 
-            tb.innerHTML = data.map(item => {
-                const precoUnAtual = item.valor_atual_unitario || (item.quantidade ? item.saldo_atual / item.quantidade : 0);
-                const saldoTotal = item.quantidade * precoUnAtual;
-                const diferenca = saldoTotal - item.valor_aplicado;
-                const percentual = item.valor_aplicado > 0 ? (diferenca / item.valor_aplicado) * 100 : 0;
-                
-                const corLucro = diferenca >= 0 ? 'text-success' : 'text-danger';
-                const sinal = diferenca >= 0 ? '+' : '';
+            const totalLucro = saldoTotalGeral - totalAplicado;
+            const percTotalLucro = totalAplicado > 0 ? (totalLucro / totalAplicado) * 100 : 0;
+            const sinalLucro = totalLucro >= 0 ? '+' : '';
 
-                return `
-                    <tr>
-                        <td class="fw-bold">${item.nome}</td>
-                        <td><span class="badge bg-secondary">${item.tipo}</span></td>
-                        <td>${item.quantidade}</td>
-                        <td>${moeda(item.valor_aplicado)}</td>
-                        <td>${moeda(precoUnAtual)}</td>
-                        <td class="fw-bold">${moeda(saldoTotal)}</td>
-                        <td class="${corLucro} fw-bold">
-                            ${sinal}${moeda(diferenca)} (${sinal}${percentual.toFixed(2)}%)
-                        </td>
-                        <td><button class="btn btn-danger btn-sm" onclick="excluirInvestimento(${item.id})">Excluir</button></td>
-                    </tr>
-                `;
-            }).join('');
+            const elSaldo = document.getElementById('saldoTotalInvestimentos');
+            const elAplicado = document.getElementById('totalAplicadoInvestimentos');
+            const elLucro = document.getElementById('lucroTotalInvestimentos');
+            const cardLucro = document.getElementById('cardLucroTotalInvestimentos');
+
+            if (elSaldo) elSaldo.textContent = moeda(saldoTotalGeral);
+            if (elAplicado) elAplicado.textContent = moeda(totalAplicado);
+            if (elLucro) {
+                elLucro.textContent = `${sinalLucro}${moeda(totalLucro)} (${sinalLucro}${percTotalLucro.toFixed(2)}%)`;
+                elLucro.className = totalLucro >= 0 ? 'text-success mt-1 mb-0' : 'text-danger mt-1 mb-0';
+            }
+            if (cardLucro) {
+                cardLucro.className = totalLucro >= 0 
+                    ? 'card dashboard-card border-start border-success border-4' 
+                    : 'card dashboard-card border-start border-danger border-4';
+            }
         }
 
         async function atualizarCotacoesBrapi() {
             const { data, error } = await supabaseClient.from('investimentos').select('*');
             if (error || !data || data.length === 0) return alert('Nenhum investimento cadastrado para atualizar.');
 
-            const ativosParaAtualizar = data.filter(i => i.tipo !== 'Renda Fixa');
-            if (ativosParaAtualizar.length === 0) return alert('Apenas ativos de Renda Fixa cadastrados.');
+            const ativosParaAtualizar = data.filter(i => i.tipo === 'Ação' || i.tipo === 'FII');
+
+            const ativosRendaFixa = data.filter(i => i.tipo !== 'Ação' && i.tipo !== 'FII');
+            for (let itemRF of ativosRendaFixa) {
+                const dataAplic = itemRF.data_aplicacao || new Date().toISOString().split('T')[0];
+                const diasDecorridos = Math.max(1, (new Date() - new Date(dataAplic)) / (1000 * 60 * 60 * 24));
+                const anos = diasDecorridos / 365;
+                const novoSaldoRF = itemRF.valor_aplicado * Math.pow(1 + 0.1075, anos);
+
+                await supabaseClient.from('investimentos')
+                    .update({ 
+                        valor_atual_unitario: novoSaldoRF,
+                        saldo_atual: novoSaldoRF 
+                    })
+                    .eq('id', itemRF.id);
+            }
+
+            if (ativosParaAtualizar.length === 0) {
+                alert('Renda fixa atualizada por cálculo de tempo decorrido!');
+                await carregarInvestimentos();
+                return;
+            }
 
             try {
                 const tokenBrapi = "vjeX1w31CVy553VToQa99J";
                 let atualizados = 0;
 
                 for (let item of ativosParaAtualizar) {
-                    const ticker = item.nome.trim();
+                    const ticker = item.nome.split(' ')[0].trim();
                     const url = `https://brapi.dev/api/quote/${ticker}?token=${tokenBrapi}`;
                     
                     const response = await fetch(url);
@@ -1020,9 +2268,8 @@
                     await new Promise(resolve => setTimeout(resolve, 300));
                 }
                 
-                alert(`Cotações atualizadas com sucesso para ${atualizados} de ${ativosParaAtualizar.length} ativo(s)!`);
+                alert(`Cotações atualizadas para ${atualizados} Ação/FII(s) e Renda Fixa recalculada!`);
                 await carregarInvestimentos();
-                if (typeof carregarDashboard === 'function') carregarDashboard();
 
             } catch (e) {
                 console.error('Erro ao consultar Brapi:', e);
@@ -1036,7 +2283,7 @@
             await carregarInvestimentos();
         }
 
-        // RECEITAS
+        // ================= RECEITAS =================
         async function salvarReceita() {
             const desc = document.getElementById('descReceita').value.trim();
             const valor = Number(document.getElementById('valorReceita').value);
@@ -1070,7 +2317,7 @@
                     <td>${formatarData(item.data_recebimento)}</td>
                     <td>${item.descricao}</td>
                     <td class="text-success fw-bold">+ ${moeda(item.valor)}</td>
-                    <td><button class="btn btn-danger btn-sm" onclick="excluirReceita(${item.id})">Excluir</button></td>
+                    <td><button class="btn btn-danger btn-sm" onclick="excluirReceita(${item.id})"><i class="bi bi-trash"></i> Excluir</button></td>
                 </tr>
             `).join('');
         }
