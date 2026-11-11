@@ -220,7 +220,7 @@
                 <div class="col-md-3">
                     <div class="card dashboard-card bg-dark text-white">
                         <div class="card-body">
-                            <small>Próxima Fatura</small>
+                            <small>Próxima Fatura (Em Aberto)</small>
                             <h4 id="proximaFatura" class="mt-1">R$ 0,00</h4>
                             <div id="competenciaFatura" class="small opacity-75"></div>
                         </div>
@@ -404,7 +404,7 @@
         <div id="parcelasTela" style="display:none;">
             <div class="card dashboard-card mb-4">
                 <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <span>📦 Gestão de Parcelas & Faturas</span>
+                    <span>📦 Gestão de Parcelas & Faturas por Mês</span>
                     <div class="d-flex gap-2">
                         <button class="btn btn-sm btn-danger" id="btnExcluirSelecionadosParcelas" style="display:none;" onclick="excluirParcelasEmMassa()"><i class="bi bi-trash"></i> Excluir Selecionadas (<span id="qtdParcelasSelecionadas">0</span>)</button>
                         <button class="btn btn-sm btn-outline-secondary" onclick="limparFiltrosParcelas()">Limpar Filtros</button>
@@ -444,13 +444,13 @@
                         <div class="col-md-4">
                             <label class="form-label fw-bold"><i class="bi bi-check2-circle"></i> Status da Parcela</label>
                             <select id="filtroStatusParcela" class="form-select" onchange="aplicarFiltrosParcelas()">
-                                <option value="">Todos os Status</option>
-                                <option value="abertas" selected>Apenas em Aberto</option>
+                                <option value="" selected>Todos os Status</option>
+                                <option value="abertas">Apenas em Aberto</option>
                                 <option value="pagas">Apenas Pagas</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold"><i class="bi bi-calendar-event"></i> Mês Vencimento</label>
+                            <label class="form-label fw-bold"><i class="bi bi-calendar-event"></i> Mês Vencimento (Filtro Obrigatório p/ Agrupamento)</label>
                             <input type="month" id="filtroMesVencimentoParcelas" class="form-control" onchange="aplicarFiltrosParcelas()">
                         </div>
                     </div>
@@ -467,16 +467,13 @@
                         </div>
                     </div>
 
-                    <div class="table-responsive">
-                        <table class="table align-middle">
-                            <thead><tr><th style="width: 40px;"><input type="checkbox" id="checkTodasParcelas" class="form-check-input" onchange="selecionarTodasParcelas(this)"></th><th>Compra</th><th>Parcela</th><th>Vencimento</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead>
-                            <tbody id="tbParcelasTela"></tbody>
-                        </table>
-                    </div>
+                    <!-- ÁREA DE EXIBIÇÃO AGRUPADA POR FATURA DE CARTÃO -->
+                    <div id="containerFaturasAgrupadas"></div>
                 </div>
             </div>
+            
             <div class="card dashboard-card">
-                <div class="card-header bg-white fw-bold">Próximas Faturas</div>
+                <div class="card-header bg-white fw-bold">Próximas Faturas Geral</div>
                 <div class="card-body table-responsive">
                     <table class="table align-middle">
                         <thead><tr><th>Mês</th><th>Parcelas</th><th>Total</th></tr></thead>
@@ -576,9 +573,8 @@
             </div>
         </div>
 
-        <!-- TELA 6: ORÇAMENTOS (COM CADASTRO, EDIÇÃO E EXCLUSÃO) -->
+        <!-- TELA 6: ORÇAMENTOS -->
         <div id="orcamentosTela" style="display:none;">
-            <!-- FORMULÁRIO DE CADASTRO/EDIÇÃO DE ORÇAMENTO -->
             <div class="card dashboard-card mb-4">
                 <div class="card-header bg-white fw-bold" id="tituloFormOrcamento">🎯 Cadastrar / Editar Orçamento</div>
                 <div class="card-body">
@@ -619,9 +615,8 @@
             </div>
         </div>
 
-        <!-- TELA 7: INVESTIMENTOS & AÇÕES (FLUXO ADAPTATIVO POR TIPO) -->
+        <!-- TELA 7: INVESTIMENTOS & AÇÕES -->
         <div id="investimentosTela" style="display:none;">
-            <!-- CARDS DE RESUMO TOTAL DA CARTEIRA -->
             <div class="row g-3 mb-4">
                 <div class="col-md-4">
                     <div class="card dashboard-card bg-primary text-white">
@@ -652,7 +647,6 @@
             <div class="card dashboard-card mb-4">
                 <div class="card-header bg-white fw-bold">📈 Cadastrar Investimento</div>
                 <div class="card-body">
-                    <!-- PASSO 1: ESCOLHER TIPO -->
                     <div class="row g-3 mb-3">
                         <div class="col-md-4">
                             <label class="form-label fw-bold">1. Escolha o Tipo de Investimento</label>
@@ -668,12 +662,10 @@
                         </div>
                     </div>
 
-                    <!-- PASSO 2: FORMULÁRIO DINÂMICO -->
-                    <!-- PAINEL PARA VARIABLE (AÇÕES / FIIS) -->
                     <div id="painelVariavel" class="row g-3">
                         <div class="col-md-3 position-relative">
                             <label class="form-label">Ativo / Ticker ou Empresa</label>
-                            <input type="text" id="tickerInvestimento" class="form-control" placeholder="Ex: PETR4 ou Banco do Brasil..." autocomplete="off">
+                            <input type="text" id="tickerInvestimento" class="form-control" placeholder="Ex: PETR4, SBSP3..." autocomplete="off">
                             <div id="sugestoesAcoes" class="autocomplete-sugestoes"></div>
                         </div>
                         <div class="col-md-2">
@@ -690,7 +682,6 @@
                         </div>
                     </div>
 
-                    <!-- PAINEL PARA RENDA FIXA (CDB / TESOURO / RENDA FIXA) -->
                     <div id="painelRendaFixa" class="row g-3" style="display:none;">
                         <div class="col-md-3">
                             <label class="form-label">Nome do Titulo / Emissor</label>
@@ -726,7 +717,6 @@
                 </div>
             </div>
 
-            <!-- CARTEIRA DE INVESTIMENTOS -->
             <div class="card dashboard-card">
                 <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
                     <span>Minha Carteira</span>
@@ -822,12 +812,6 @@
             return `${partes[2]}/${partes[1]}/${partes[0]}`;
         }
 
-        function formatarDataHora(dataIso) {
-            if (!dataIso) return '-';
-            const dataObj = new Date(dataIso);
-            return dataObj.toLocaleDateString('pt-BR') + ' ' + dataObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-        }
-
         function toggleSidebar() {
             document.getElementById("sidebar").classList.toggle("show");
         }
@@ -840,7 +824,13 @@
 
             if (nomeTela === 'dashboardTela') { carregarDashboard(); carregarFatura(); carregarGraficoMensal(); }
             if (nomeTela === 'comprasCredito') { carregarCartoes(); carregarCategorias(); carregarCompras(); carregarGraficoCategorias(); carregarGestaoCartoes(); }
-            if (nomeTela === 'parcelasTela') { carregarParcelasTela(); carregarFaturas(); }
+            if (nomeTela === 'parcelasTela') { 
+                const mesAtual = new Date().toISOString().slice(0, 7);
+                const inputMesParc = document.getElementById('filtroMesVencimentoParcelas');
+                if (inputMesParc && !inputMesParc.value) inputMesParc.value = mesAtual;
+                carregarParcelasTela(); 
+                carregarFaturas(); 
+            }
             if (nomeTela === 'debitoTela') { carregarDebitos(); }
             if (nomeTela === 'outrosGastosTela') { carregarOutrosGastos(); }
             if (nomeTela === 'orcamentosTela') { carregarCategoriasParaOrcamento(); carregarOrcamentosTela(); }
@@ -863,6 +853,9 @@
             { ticker: "ABEV3", nome: "Ambev S.A." },
             { ticker: "MGLU3", nome: "Magazine Luiza" },
             { ticker: "BBSE3", nome: "BB Seguridade" },
+            { ticker: "SBSP3", nome: "Sabesp (Saneamento)" },
+            { ticker: "TAEE11", nome: "Taesa Unit" },
+            { ticker: "CPLE6", nome: "Copel PNB" },
             { ticker: "MXRF11", nome: "FII Maxi Renda" },
             { ticker: "HGLG11", nome: "FII CSHG Logística" },
             { ticker: "KNCR11", nome: "FII Kinea Rendimentos" },
@@ -905,6 +898,7 @@
 
             const mesAtual = new Date().toISOString().slice(0, 7);
             if (document.getElementById('filtroMesDashboard')) document.getElementById('filtroMesDashboard').value = mesAtual;
+            if (document.getElementById('filtroMesVencimentoParcelas')) document.getElementById('filtroMesVencimentoParcelas').value = mesAtual;
 
             await carregarFiltrosSelects();
             carregarDashboard();
@@ -919,7 +913,7 @@
             if (divSugestoes) divSugestoes.style.display = 'none';
         }
 
-        // ================= DASHBOARD COM FILTRO DE MÊS =================
+        // ================= DASHBOARD =================
         async function carregarDashboard() {
             const mesFiltro = document.getElementById('filtroMesDashboard') ? document.getElementById('filtroMesDashboard').value : '';
 
@@ -932,7 +926,6 @@
                 fim = `${ano}-${mes}-${String(ultimoDia).padStart(2, '0')}`;
             }
 
-            // Busca Receitas
             let queryReceitas = supabaseClient.from('fin_receitas').select('valor, data_recebimento');
             if (mesFiltro) {
                 queryReceitas = queryReceitas.gte('data_recebimento', inicio).lte('data_recebimento', fim);
@@ -940,10 +933,15 @@
             const { data: recData } = await queryReceitas;
             const totalRec = (recData || []).reduce((acc, r) => acc + Number(r.valor || 0), 0);
 
-            // Busca Crédito
             await carregarFiltrosSelects();
             const { data: credData } = await supabaseClient.from('vw_fin_compras_credito').select('*');
             let totalCred = 0;
+
+            const { data: faturasPagasDb } = await supabaseClient.from('fin_faturas_pagas').select('*');
+            const mapFaturasPagas = {};
+            (faturasPagasDb || []).forEach(f => {
+                if (f.paga) mapFaturasPagas[`${f.cartao_id}_${f.mes_ano}`] = true;
+            });
 
             (credData || []).forEach(item => {
                 const cartaoId = item.cartao_id || item.id_cartao;
@@ -954,18 +952,23 @@
 
                 for (let i = 1; i <= qtdParcelas; i++) {
                     const dtVencReal = calcularVencimentoFatura(dtCompra, configCartao.dia_fechamento, configCartao.dia_vencimento, i);
-                    if (mesFiltro) {
-                        const [ano, mes] = mesFiltro.split('-');
-                        if (dtVencReal && dtVencReal.startsWith(`${ano}-${mes}`)) {
-                            totalCred += valorParc;
+                    if (dtVencReal) {
+                        const mesAnoStr = dtVencReal.slice(0, 7);
+                        const faturaEstaPaga = mapFaturasPagas[`${cartaoId}_${mesAnoStr}`];
+
+                        if (!faturaEstaPaga) {
+                            if (mesFiltro) {
+                                if (dtVencReal.startsWith(mesFiltro)) {
+                                    totalCred += valorParc;
+                                }
+                            } else {
+                                totalCred += valorParc;
+                            }
                         }
-                    } else {
-                        totalCred += valorParc;
                     }
                 }
             });
 
-            // Busca Débito
             let queryDebito = supabaseClient.from('fin_movimentacoes_debito').select('valor, data_movimentacao');
             if (mesFiltro) {
                 queryDebito = queryDebito.gte('data_movimentacao', inicio).lte('data_movimentacao', fim);
@@ -973,7 +976,6 @@
             const { data: debData } = await queryDebito;
             const totalDeb = (debData || []).reduce((acc, d) => acc + Number(d.valor || 0), 0);
 
-            // Busca Outros Gastos
             let queryOutros = supabaseClient.from('fin_outros_gastos').select('valor, data_gasto');
             if (mesFiltro) {
                 queryOutros = queryOutros.gte('data_gasto', inicio).lte('data_gasto', fim);
@@ -1001,6 +1003,12 @@
             const { data } = await supabaseClient.from('vw_fin_compras_credito').select('*');
             if (!data) return;
 
+            const { data: faturasPagasDb } = await supabaseClient.from('fin_faturas_pagas').select('*');
+            const mapFaturasPagas = {};
+            (faturasPagasDb || []).forEach(f => {
+                if (f.paga) mapFaturasPagas[`${f.cartao_id}_${f.mes_ano}`] = true;
+            });
+
             let parcelasGeradas = [];
             data.forEach(compra => {
                 const cartaoId = compra.cartao_id || compra.id_cartao;
@@ -1012,11 +1020,14 @@
                 for (let i = 1; i <= totalParc; i++) {
                     const dtVenc = calcularVencimentoFatura(dtCompra, configCartao.dia_fechamento, configCartao.dia_vencimento, i);
                     if (dtVenc) {
-                        parcelasGeradas.push({
-                            valor_parcela: valorUnicoParcela,
-                            data_vencimento: dtVenc,
-                            paga: false
-                        });
+                        const mesAnoStr = dtVenc.slice(0, 7);
+                        const faturaPaga = !!mapFaturasPagas[`${cartaoId}_${mesAnoStr}`];
+                        if (!faturaPaga) {
+                            parcelasGeradas.push({
+                                valor_parcela: valorUnicoParcela,
+                                data_vencimento: dtVenc
+                            });
+                        }
                     }
                 }
             });
@@ -1083,14 +1094,14 @@
             });
         }
 
-        // ================= GESTÃO DE CARTÕES & COMPRAS CRÉDITO =================
+        // ================= GESTÃO DE CARTÕES & COMPRAS =================
         function calcularVencimentoFatura(dataCompraStr, diaFechamento = 25, diaVencimento = 1, numParcela = 1) {
             if (!dataCompraStr) return '';
             const partes = dataCompraStr.split('T')[0].split('-');
             if (partes.length !== 3) return dataCompraStr;
 
             let ano = parseInt(partes[0], 10);
-            let mes = parseInt(partes[1], 10) - 1; // 0-indexed
+            let mes = parseInt(partes[1], 10) - 1; 
             const diaCompra = parseInt(partes[2], 10);
 
             if (diaCompra <= diaFechamento) {
@@ -1576,24 +1587,29 @@
             listaTodasParcelas = [];
         }
 
-        // ================= PARCELAS E FATURAS =================
+        // ================= PARCELAS E FATURAS AGRUPADAS =================
         let listaTodasParcelas = [];
 
         async function carregarParcelasTela() {
             await carregarFiltrosSelects();
 
             let { data: compras, error } = await supabaseClient.from('fin_gastos_credito').select('*');
-
             if (error || !compras || compras.length === 0) {
                 const resView = await supabaseClient.from('vw_fin_compras_credito').select('*');
                 compras = resView.data || [];
             }
 
+            const { data: faturasPagasDb } = await supabaseClient.from('fin_faturas_pagas').select('*');
+            const mapFaturasPagas = {};
+            (faturasPagasDb || []).forEach(f => {
+                if (f.paga) mapFaturasPagas[`${f.cartao_id}_${f.mes_ano}`] = true;
+            });
+
             let parcelasGeradas = [];
 
             compras.forEach(compra => {
                 const cartaoId = compra.cartao_id || compra.id_cartao;
-                const configCartao = mapaCartoesGlobal[cartaoId] || { dia_fechamento: 25, dia_vencimento: 1 };
+                const configCartao = mapaCartoesGlobal[cartaoId] || { dia_fechamento: 25, dia_vencimento: 1, nome: 'Cartão' };
                 const dtCompra = compra.data_compra || compra.dt_compra;
                 const totalParc = Number(compra.quantidade_parcelas || 1);
                 const valorUnicoParcela = Number(compra.valor_compra || 0) / (totalParc || 1);
@@ -1601,6 +1617,10 @@
 
                 for (let i = 1; i <= totalParc; i++) {
                     const dtVenc = calcularVencimentoFatura(dtCompra, configCartao.dia_fechamento, configCartao.dia_vencimento, i);
+                    if (!dtVenc) continue;
+
+                    const mesAnoStr = dtVenc.slice(0, 7);
+                    const faturaPaga = !!mapFaturasPagas[`${cartaoId}_${mesAnoStr}`];
                     
                     parcelasGeradas.push({
                         id: `${compra.id}_${i}`,
@@ -1608,13 +1628,13 @@
                         descricao: compra.descricao,
                         numero_parcela: i,
                         total_parcelas: totalParc,
-                        quantidade_parcelas: totalParc,
                         valor_parcela: valorUnicoParcela,
                         data_vencimento: dtVenc,
-                        data_compra: dtCompra,
+                        mes_ano: mesAnoStr,
                         cartao_id: cartaoId,
+                        nome_cartao: configCartao.nome,
                         categoria: nomeCategoria,
-                        paga: false
+                        paga: faturaPaga
                     });
                 }
             });
@@ -1627,15 +1647,15 @@
 
         function aplicarFiltrosParcelas() {
             const tipo = document.getElementById('filtroTipoParcela') ? document.getElementById('filtroTipoParcela').value : '';
-            const status = document.getElementById('filtroStatusParcela') ? document.getElementById('filtroStatusParcela').value : 'abertas';
+            const status = document.getElementById('filtroStatusParcela') ? document.getElementById('filtroStatusParcela').value : '';
             const mesVenc = document.getElementById('filtroMesVencimentoParcelas') ? document.getElementById('filtroMesVencimentoParcelas').value : '';
 
             let resultado = listaTodasParcelas;
 
             if (tipo === 'parceladas') {
-                resultado = resultado.filter(p => Number(p.total_parcelas || p.quantidade_parcelas) > 1);
+                resultado = resultado.filter(p => Number(p.total_parcelas) > 1);
             } else if (tipo === 'avista') {
-                resultado = resultado.filter(p => Number(p.total_parcelas || p.quantidade_parcelas) === 1);
+                resultado = resultado.filter(p => Number(p.total_parcelas) === 1);
             }
 
             if (status === 'abertas') {
@@ -1645,15 +1665,10 @@
             }
 
             if (mesVenc) {
-                const [ano, mes] = mesVenc.split('-');
-                resultado = resultado.filter(p => {
-                    if (!p.data_vencimento) return false;
-                    const partes = p.data_vencimento.split('-');
-                    return partes[0] === ano && partes[1] === mes;
-                });
+                resultado = resultado.filter(p => p.mes_ano === mesVenc);
             }
 
-            renderizarTabelaParcelas(resultado);
+            renderizarFaturasAgrupadas(resultado);
             carregarGraficoCategoriasParcelas(resultado);
         }
 
@@ -1687,16 +1702,14 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
+                        legend: { position: 'bottom' }
                     }
                 }
             });
         }
 
-        function renderizarTabelaParcelas(dados) {
-            const tb = document.getElementById('tbParcelasTela');
+        function renderizarFaturasAgrupadas(dados) {
+            const container = document.getElementById('containerFaturasAgrupadas');
             const totalValEl = document.getElementById('totalValorParcelas');
             const totalQtdEl = document.getElementById('qtdParcelasFiltradas');
 
@@ -1704,50 +1717,106 @@
             if (totalValEl) totalValEl.textContent = moeda(totalSum);
             if (totalQtdEl) totalQtdEl.textContent = dados.length;
 
-            if (!tb) return;
+            if (!container) return;
 
             if (!dados || dados.length === 0) {
-                tb.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Nenhuma parcela encontrada para os filtros selecionados.</td></tr>';
+                container.innerHTML = '<div class="alert alert-secondary text-center">Nenhuma parcela ou fatura encontrada para os filtros selecionados.</div>';
                 return;
             }
 
-            tb.innerHTML = dados.map(item => `
-                <tr>
-                    <td><input type="checkbox" class="form-check-input check-parcela-item" value="${item.gasto_id || item.id}" onchange="atualizarBotaoExclusaoMassaParcelas()"></td>
-                    <td class="fw-bold">${item.descricao}</td>
-                    <td><span class="badge ${(item.total_parcelas || item.quantidade_parcelas) > 1 ? 'bg-primary' : 'bg-secondary'}">${item.numero_parcela}/${item.total_parcelas || item.quantidade_parcelas || 1}</span></td>
-                    <td><span class="badge bg-info text-dark">${formatarData(item.data_vencimento)}</span></td>
-                    <td class="fw-bold">${moeda(item.valor_parcela)}</td>
-                    <td>
-                        ${item.paga ? '<span class="badge bg-success">Paga</span>' : '<span class="badge bg-danger">Aberta</span>'}
-                    </td>
-                    <td>
-                        <button class="btn btn-${item.paga ? 'warning' : 'success'} btn-sm" onclick="pagarParcela('${item.id}')">
-                            ${item.paga ? 'Desfazer' : 'Pagar'}
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
+            let agrupamento = {};
+            dados.forEach(item => {
+                const chave = `${item.cartao_id}_${item.mes_ano}`;
+                if (!agrupamento[chave]) {
+                    agrupamento[chave] = {
+                        cartao_id: item.cartao_id,
+                        nome_cartao: item.nome_cartao,
+                        mes_ano: item.mes_ano,
+                        paga: item.paga,
+                        itens: []
+                    };
+                }
+                agrupamento[chave].itens.push(item);
+            });
 
-            const checkAll = document.getElementById('checkTodasParcelas');
-            if (checkAll) checkAll.checked = false;
-            atualizarBotaoExclusaoMassaParcelas();
+            let htmlFinal = '';
+
+            Object.values(agrupamento).sort((a,b) => a.mes_ano > b.mes_ano ? 1 : -1).forEach(grupo => {
+                const totalFatura = grupo.itens.reduce((acc, i) => acc + Number(i.valor_parcela || 0), 0);
+                const [ano, mes] = grupo.mes_ano.split('-');
+                const mesAnoFormatado = `${mes}/${ano}`;
+                const statusFaturaPaga = grupo.itens.every(i => i.paga);
+
+                htmlFinal += `
+                    <div class="card dashboard-card mb-4 border ${statusFaturaPaga ? 'border-success' : 'border-primary'} shadow-sm">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center flex-wrap gap-2 py-3">
+                            <div>
+                                <h5 class="mb-0 fw-bold text-primary"><i class="bi bi-credit-card-2-front"></i> ${grupo.nome_cartao || 'Cartão'}</h5>
+                                <small class="text-muted"><i class="bi bi-calendar-event"></i> Vencimento da Fatura: <strong>${mesAnoFormatado}</strong></small>
+                            </div>
+                            <div class="d-flex align-items-center gap-3">
+                                <div>
+                                    <span class="text-muted small d-block">Total da Fatura</span>
+                                    <h4 class="mb-0 fw-bold">${moeda(totalFatura)}</h4>
+                                </div>
+                                <button class="btn btn-${statusFaturaPaga ? 'warning' : 'success'} btn-sm px-4 py-2 fw-bold" onclick="pagarFaturaCartao('${grupo.cartao_id}', '${grupo.mes_ano}', ${!statusFaturaPaga})">
+                                    <i class="bi bi-${statusFaturaPaga ? 'arrow-counterclockwise' : 'check-circle'}"></i> ${statusFaturaPaga ? 'Desfazer Fatura Paga' : 'Pagar Fatura Completa'}
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table align-middle mb-0 table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Compra / Descrição</th>
+                                            <th>Categoria</th>
+                                            <th>Parcela</th>
+                                            <th>Vencimento</th>
+                                            <th>Valor</th>
+                                            <th>Status Parcela</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${grupo.itens.map(item => `
+                                            <tr>
+                                                <td class="fw-bold">${item.descricao}</td>
+                                                <td><span class="badge bg-secondary">${item.categoria || 'Outros'}</span></td>
+                                                <td><span class="badge ${item.total_parcelas > 1 ? 'bg-primary' : 'bg-dark'}">${item.numero_parcela}/${item.total_parcelas}</span></td>
+                                                <td>${formatarData(item.data_vencimento)}</td>
+                                                <td class="fw-bold">${moeda(item.valor_parcela)}</td>
+                                                <td>
+                                                    ${item.paga ? '<span class="badge bg-success">Paga (Via Fatura)</span>' : '<span class="badge bg-danger">Aberta</span>'}
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = htmlFinal;
         }
 
-        function limparFiltrosParcelas() {
-            if (document.getElementById('filtroTipoParcela')) document.getElementById('filtroTipoParcela').value = '';
-            if (document.getElementById('filtroStatusParcela')) document.getElementById('filtroStatusParcela').value = '';
-            if (document.getElementById('filtroMesVencimentoParcelas')) document.getElementById('filtroMesVencimentoParcelas').value = '';
-            aplicarFiltrosParcelas();
-        }
+        async function pagarFaturaCartao(cartaoId, mesAno, novoStatus) {
+            const { error } = await supabaseClient
+                .from('fin_faturas_pagas')
+                .upsert({
+                    cartao_id: Number(cartaoId),
+                    mes_ano: mesAno,
+                    paga: novoStatus
+                }, { onConflict: 'cartao_id,mes_ano' });
 
-        async function pagarParcela(id) {
-            const item = listaTodasParcelas.find(p => p.id == id);
-            if (!item) return;
+            if (error) {
+                console.error('Erro ao atualizar fatura:', error);
+                alert('Erro ao salvar o status da fatura no banco de dados.');
+                return;
+            }
 
-            item.paga = !item.paga;
-
-            aplicarFiltrosParcelas();
+            carregarParcelasTela();
             carregarFaturas();
             carregarDashboard();
         }
@@ -1756,6 +1825,12 @@
             await carregarFiltrosSelects();
             const { data } = await supabaseClient.from('vw_fin_compras_credito').select('*');
             if (!data) return;
+
+            const { data: faturasPagasDb } = await supabaseClient.from('fin_faturas_pagas').select('*');
+            const mapFaturasPagas = {};
+            (faturasPagasDb || []).forEach(f => {
+                if (f.paga) mapFaturasPagas[`${f.cartao_id}_${f.mes_ano}`] = true;
+            });
 
             const faturasAgrupadas = {};
 
@@ -1769,13 +1844,20 @@
                 for (let i = 1; i <= totalParc; i++) {
                     const dtVenc = calcularVencimentoFatura(dtCompra, configCartao.dia_fechamento, configCartao.dia_vencimento, i);
                     if (dtVenc) {
+                        const mesAnoStr = dtVenc.slice(0, 7);
                         const [ano, mes] = dtVenc.split('-');
                         const chave = `${mes}/${ano}`;
+                        const faturaPaga = !!mapFaturasPagas[`${cId}_${mesAnoStr}`];
+
                         if (!faturasAgrupadas[chave]) {
-                            faturasAgrupadas[chave] = { mes, ano, parcelas: 0, valor_total: 0 };
+                            faturasAgrupadas[chave] = { mes, ano, parcelas: 0, valor_total: 0, pagas: 0 };
                         }
                         faturasAgrupadas[chave].parcelas += 1;
-                        faturasAgrupadas[chave].valor_total += valorUnicoParcela;
+                        if (!faturaPaga) {
+                            faturasAgrupadas[chave].valor_total += valorUnicoParcela;
+                        } else {
+                            faturasAgrupadas[chave].pagas += 1;
+                        }
                     }
                 }
             });
@@ -1788,45 +1870,21 @@
                     tb.innerHTML = '<tr><td colspan="3" class="text-center text-muted">Nenhuma fatura encontrada.</td></tr>';
                 } else {
                     tb.innerHTML = listaFaturas.map(item => `
-                        <tr><td>${item.mes}/${item.ano}</td><td>${item.parcelas}</td><td>${moeda(item.valor_total)}</td></tr>
+                        <tr>
+                            <td>${item.mes}/${item.ano}</td>
+                            <td>${item.parcelas} parcelas ${item.pagas > 0 ? `<small class="text-success">(${item.pagas} pagas)</small>` : ''}</td>
+                            <td class="fw-bold">${moeda(item.valor_total)}</td>
+                        </tr>
                     `).join('');
                 }
             }
         }
 
-        function selecionarTodasParcelas(elCheckAll) {
-            const checkboxes = document.querySelectorAll('.check-parcela-item');
-            checkboxes.forEach(cb => cb.checked = elCheckAll.checked);
-            atualizarBotaoExclusaoMassaParcelas();
-        }
-
-        function atualizarBotaoExclusaoMassaParcelas() {
-            const selecionados = document.querySelectorAll('.check-parcela-item:checked');
-            const btn = document.getElementById('btnExcluirSelecionadosParcelas');
-            const qtd = document.getElementById('qtdParcelasSelecionadas');
-            if (btn && qtd) {
-                if (selecionados.length > 0) {
-                    btn.style.display = 'inline-block';
-                    qtd.textContent = selecionados.length;
-                } else {
-                    btn.style.display = 'none';
-                    qtd.textContent = '0';
-                }
-            }
-        }
-
-        async function excluirParcelasEmMassa() {
-            const selecionados = Array.from(document.querySelectorAll('.check-parcela-item:checked')).map(cb => Number(cb.value));
-            if (selecionados.length === 0) return;
-
-            if (!confirm(`Deseja realmente excluir as compras selecionadas?`)) return;
-
-            const { error } = await supabaseClient.from('fin_gastos_credito').delete().in('id', selecionados);
-            if (error) return alert('Erro ao excluir parcelas: ' + error.message);
-
-            alert(`Compras/Parcelas excluídas com sucesso!`);
-            carregarParcelasTela();
-            carregarDashboard();
+        function limparFiltrosParcelas() {
+            if (document.getElementById('filtroTipoParcela')) document.getElementById('filtroTipoParcela').value = '';
+            if (document.getElementById('filtroStatusParcela')) document.getElementById('filtroStatusParcela').value = '';
+            if (document.getElementById('filtroMesVencimentoParcelas')) document.getElementById('filtroMesVencimentoParcelas').value = new Date().toISOString().slice(0, 7);
+            aplicarFiltrosParcelas();
         }
 
         // ================= DÉBITO / PIX =================
